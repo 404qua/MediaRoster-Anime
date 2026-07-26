@@ -1,5 +1,5 @@
 const CACHE_DURATION = 300000;
-const BASE_URL = 'https://api.jikan.moe/v4';
+export const BASE_URL = 'https://api.tenrai.org/v1';
 export const genres = {};
 const logErrorByStatus = (status, statusText) => {
     switch (status) {
@@ -13,13 +13,13 @@ const logErrorByStatus = (status, statusText) => {
             console.log('Requested Method is not supported for resource. Only GET requests are allowed');
             break;
         case 429:
-            console.log('You are being rate limited by Jikan or MyAnimeList is rate-limiting our servers');
+            console.log('You are being rate limited by Tenrai or MyAnimeList is rate-limiting our servers');
             break;
         case 500:
             console.log('Something didn\'t work. Try again later. If you see an error response with a report_url URL, please click on it to open an auto-generated GitHub issue');
             break;
         case 503:
-            console.log('Jikan service is down. Try again later');
+            console.log('Tenrai service is down. Try again later');
             break;
         default:
             console.log('Unknown Error while fetching data');
@@ -208,9 +208,9 @@ export const getAnimeReviews = async (animeId) => {
     return res.data;
 };
 
-export async function searchAnime(JikanURL) {
-    if (JikanURL) {
-        return await fetchWithoutCache(JikanURL);
+export async function searchAnime(targetURL) {
+    if (targetURL) {
+        return await fetchWithoutCache(targetURL);
     }
     return fetchWithCache(`${BASE_URL}/anime`);
 }

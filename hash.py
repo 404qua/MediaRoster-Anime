@@ -3,160 +3,323 @@ import hashlib
 import subprocess
 import shutil
 
-src_dir = '.'
-build_dir = './build'
+srcDir = "."
+buildDir = "./build"
 
-files_to_hash = {
-    'css': [
-        os.path.join(src_dir, 'css', 'style.css'),
-        os.path.join(src_dir, 'css', 'icons.css'),
-        os.path.join(src_dir, 'css', 'search.css'),
-        os.path.join(src_dir, 'css', 'details.css')
+filesToHash = {
+    "css": [
+        os.path.join(srcDir, "css", "style.css"),
+        os.path.join(srcDir, "css", "icons.css"),
+        os.path.join(srcDir, "css", "search.css"),
+        os.path.join(srcDir, "css", "details.css")
     ],
-    'js': [
-        os.path.join(src_dir, 'js', 'pages.js'),
-        os.path.join(src_dir, 'js', 'router.js'),
-        os.path.join(src_dir, 'js', 'components', 'initializer.js'),
-        os.path.join(src_dir, 'js', 'api.js'),
-        os.path.join(src_dir, 'js', 'components', 'UIs.js'),
-        os.path.join(src_dir, 'js', 'components', 'search.js'),
-        os.path.join(src_dir, 'js', 'components', 'details.js'),
-        os.path.join(src_dir, 'js', 'components', 'data.js')
+    "js": [
+        os.path.join(srcDir, "js", "pages.js"),
+        os.path.join(srcDir, "js", "router.js"),
+        os.path.join(srcDir, "js", "components", "initializer.js"),
+        os.path.join(srcDir, "js", "api.js"),
+        os.path.join(srcDir, "js", "components", "UIs.js"),
+        os.path.join(srcDir, "js", "components", "search.js"),
+        os.path.join(srcDir, "js", "components", "details.js"),
+        os.path.join(srcDir, "js", "components", "data.js")
     ],
-    'others': [
-        os.path.join(src_dir, 'media', 'jumpscare.mp3'),
-        os.path.join(src_dir, 'media', 'jumpscare.webp'),
-        os.path.join(src_dir, 'media', 'logo.webp'),
-        os.path.join(src_dir, 'media', 'details-bg.webp'),
-        os.path.join(src_dir, 'media', 'akame.webp'),
-        os.path.join(src_dir, 'media', 'AOT.webp'),
-        os.path.join(src_dir, 'media', 'AssaClass.webp'),
-        os.path.join(src_dir, 'media', 'BGS.webp'),
-        os.path.join(src_dir, 'media', 'DeathNote.webp'),
-        os.path.join(src_dir, 'media', 'DuskMaiden.webp'),
-        os.path.join(src_dir, 'media', 'eminance.webp'),
-        os.path.join(src_dir, 'media', 'naruto.webp'),
-        os.path.join(src_dir, 'media', 'ReZero.webp'),
-        os.path.join(src_dir, 'media', 'slime.webp'),
-        os.path.join(src_dir, 'media', 'konosuba.webp')
+    "others": [
+        os.path.join(srcDir, "media", "jumpscare.mp3"),
+        os.path.join(srcDir, "media", "jumpscare.webp"),
+        os.path.join(srcDir, "media", "logo.webp"),
+        os.path.join(srcDir, "media", "details-bg.webp"),
+        os.path.join(srcDir, "media", "akame.webp"),
+        os.path.join(srcDir, "media", "AOT.webp"),
+        os.path.join(srcDir, "media", "AssaClass.webp"),
+        os.path.join(srcDir, "media", "BGS.webp"),
+        os.path.join(srcDir, "media", "DeathNote.webp"),
+        os.path.join(srcDir, "media", "DuskMaiden.webp"),
+        os.path.join(srcDir, "media", "eminance.webp"),
+        os.path.join(srcDir, "media", "naruto.webp"),
+        os.path.join(srcDir, "media", "ReZero.webp"),
+        os.path.join(srcDir, "media", "slime.webp"),
+        os.path.join(srcDir, "media", "konosuba.webp")
     ]
 }
 
-def ensure_dir(path):
+try:
+    import jsmin
+except ImportError:
+    jsmin = None
+
+try:
+    import csscompressor
+except ImportError:
+    csscompressor = None
+
+try:
+    import minify_html
+except ImportError:
+    minify_html = None
+
+
+def ensureDir(path):
     os.makedirs(os.path.dirname(path), exist_ok=True)
 
-def minify_file(src, dest):
+
+def minifyFile(src, dest):
     ext = os.path.splitext(src)[1].lower()
-    ensure_dir(dest)
+    ensureDir(dest)
+
+    # Prefer Node tools
+    terserBin = shutil.which("terser")
+    cleanCssBin = (
+        shutil.which("cleancss")
+        or shutil.which("clean-css")
+    )
+    htmlMinBin = (
+        shutil.which("html-minifier-terser")
+        or shutil.which("html-minifier")
+    )
+
     cmd = None
-    if ext == '.js':
-        cmd = ['/home/user/.global_modules/bin/terser', src, '-o', dest, '--compress', '--mangle']
-    elif ext == '.css':
-        cmd = ['/home/user/.global_modules/bin/cleancss', '-o', dest, src]
-    elif ext == '.html':
+
+    if ext == ".js" and terserBin:
         cmd = [
-            '/home/user/.global_modules/bin/html-minifier', '--collapse-whitespace', '--remove-comments',
-            '--minify-css', 'true', '--minify-js', 'true', '-o', dest, src
+            terserBin,
+            src,
+            "-o",
+            dest,
+            "--compress",
+            "--mangle"
         ]
-    else:
-        shutil.copy2(src, dest)
+
+    elif ext == ".css" and cleanCssBin:
+        cmd = [
+            cleanCssBin,
+            "-o",
+            dest,
+            src
+        ]
+
+    elif ext == ".html" and htmlMinBin:
+        cmd = [
+            htmlMinBin,
+            "--collapse-whitespace",
+            "--remove-comments",
+            "--minify-css",
+            "true",
+            "--minify-js",
+            "true",
+            "-o",
+            dest,
+            src
+        ]
+
+    if cmd:
+        try:
+            toolName = os.path.basename(cmd[0])
+
+            print(
+                f"[NODE] {toolName}: "
+                f"{os.path.relpath(src, srcDir)}"
+            )
+
+            subprocess.run(
+                cmd,
+                check=True,
+                shell=(os.name == "nt")
+            )
+
+            return
+
+        except Exception as e:
+            print(
+                f"[NODE FAILED] "
+                f"{os.path.relpath(src, srcDir)}: {e}"
+            )
+        
+    # Fallback to Python
+    try:
+        with open(
+            src,
+            "r",
+            encoding="utf-8",
+            errors="ignore"
+        ) as f:
+            content = f.read()
+
+        if ext == ".js" and jsmin:
+            print(
+                f"[PYTHON] jsmin: "
+                f"{os.path.relpath(src, srcDir)}"
+            )
+            content = jsmin.jsmin(content)
+
+        elif ext == ".css" and csscompressor:
+            print(
+                f"[PYTHON] csscompressor: "
+                f"{os.path.relpath(src, srcDir)}"
+            )
+            content = csscompressor.compress(content)
+
+        elif ext == ".html" and minify_html:
+            print(
+                f"[PYTHON] minify_html: "
+                f"{os.path.relpath(src, srcDir)}"
+            )
+            content = minify_html.minify(
+                content,
+                minify_js=True,
+                minify_css=True
+            )
+
+        else:
+            raise RuntimeError(
+                "No Python minifier available."
+            )
+
+        with open(dest, "w", encoding="utf-8") as f:
+            f.write(content)
+
         return
 
-    try:
-        subprocess.run(cmd, check=True)
-    except subprocess.CalledProcessError as e:
-        print(f"Minifier failed for {src}, copying instead.")
-        shutil.copy2(src, dest)
+    except Exception as e:
+        print(
+            f"[PYTHON FAILED] "
+            f"{os.path.relpath(src, srcDir)}: {e}"
+    )
+    
+    # Final fallback
+    print(f"Copying {src} without minification.")
+    shutil.copy2(src, dest)
 
-def copy_dir(src, dest):
+
+def copyDir(src, dest):
     if not os.path.exists(src):
         return
+
     os.makedirs(dest, exist_ok=True)
+
     for entry in os.listdir(src):
-        s = os.path.join(src, entry)
-        d = os.path.join(dest, entry)
-        if os.path.isdir(s):
-            copy_dir(s, d)
+        srcPath = os.path.join(src, entry)
+        destPath = os.path.join(dest, entry)
+
+        if os.path.isdir(srcPath):
+            copyDir(srcPath, destPath)
         else:
-            shutil.copy2(s, d)
+            shutil.copy2(srcPath, destPath)
 
-def minify_all():
+
+def minifyAll():
     print("🪄 Minifying...")
-    for category in ['css', 'js']:
-        for path in files_to_hash[category]:
-            rel_path = os.path.relpath(path, src_dir)
-            dest = os.path.join(build_dir, rel_path)
-            minify_file(path, dest)
 
-    # Copy others and webfonts
-    for path in files_to_hash['others']:
-        rel_path = os.path.relpath(path, src_dir)
-        dest = os.path.join(build_dir, rel_path)
-        ensure_dir(dest)
+    for category in ["css", "js"]:
+        for path in filesToHash[category]:
+            relPath = os.path.relpath(path, srcDir)
+            dest = os.path.join(buildDir, relPath)
+            minifyFile(path, dest)
+
+    for path in filesToHash["others"]:
+        relPath = os.path.relpath(path, srcDir)
+        dest = os.path.join(buildDir, relPath)
+        ensureDir(dest)
         shutil.copy2(path, dest)
 
-    copy_dir(os.path.join(src_dir, 'webfonts'), os.path.join(build_dir, 'webfonts'))
+    copyDir(
+        os.path.join(srcDir, "webfonts"),
+        os.path.join(buildDir, "webfonts")
+    )
 
-    if os.path.exists('index.html'):
-        minify_file('index.html', os.path.join(build_dir, 'index.html'))
+    indexPath = os.path.join(srcDir, "index.html")
+    if os.path.exists(indexPath):
+        minifyFile(
+            indexPath,
+            os.path.join(buildDir, "index.html")
+        )
 
-    if os.path.exists('404.html'):
-        minify_file('404.html', os.path.join(build_dir, '404.html'))
+    notFoundPath = os.path.join(srcDir, "404.html")
+    if os.path.exists(notFoundPath):
+        minifyFile(
+            notFoundPath,
+            os.path.join(buildDir, "404.html")
+        )
 
     print("Minification done.")
 
-def hash_and_update_refs():
+
+def hashAndUpdateRefs():
     print("Hashing and updating references...")
-    hashed_map = {}
-    built_files_to_update = []
 
-    for category in ['css', 'js']:
-        for path in files_to_hash[category]:
-            built_file = os.path.join(build_dir, os.path.relpath(path, src_dir))
-            if not os.path.exists(built_file):
+    hashedMap = {}
+    builtFilesToUpdate = []
+
+    for category in ["css", "js"]:
+        for path in filesToHash[category]:
+            builtFile = os.path.join(
+                buildDir,
+                os.path.relpath(path, srcDir)
+            )
+
+            if not os.path.exists(builtFile):
                 continue
-            with open(built_file, 'rb') as f:
+
+            with open(builtFile, "rb") as f:
                 content = f.read()
+
             digest = hashlib.md5(content).hexdigest()[:8]
-            base, ext = os.path.splitext(os.path.basename(path))
-            new_name = f"{base}.{digest}{ext}"
-            new_path = os.path.join(os.path.dirname(built_file), new_name)
-            os.rename(built_file, new_path)
 
-            # Use just the filename as key for JS files
-            hashed_map[f"{base}{ext}"] = new_name
+            base, ext = os.path.splitext(
+                os.path.basename(path)
+            )
 
-            # Add JS and HTML files to update list immediately
-            if ext in ('.js', '.html'):
-                built_files_to_update.append(new_path)
+            newName = f"{base}.{digest}{ext}"
+            newPath = os.path.join(
+                os.path.dirname(builtFile),
+                newName
+            )
 
-    # Add index.html if it exists
-    index_file = os.path.join(build_dir, 'index.html')
-    if os.path.exists(index_file):
-        built_files_to_update.append(index_file)
+            os.rename(builtFile, newPath)
 
-    _404_file = os.path.join(build_dir, '404.html')
-    if os.path.exists(_404_file):
-        built_files_to_update.append(_404_file)
+            hashedMap[f"{base}{ext}"] = newName
 
-    # Update references
-    for file_path in built_files_to_update:
-        with open(file_path, 'r', encoding='utf-8') as f:
+            if ext in (".js", ".html"):
+                builtFilesToUpdate.append(newPath)
+
+    indexFile = os.path.join(buildDir, "index.html")
+    if os.path.exists(indexFile):
+        builtFilesToUpdate.append(indexFile)
+
+    notFoundFile = os.path.join(buildDir, "404.html")
+    if os.path.exists(notFoundFile):
+        builtFilesToUpdate.append(notFoundFile)
+
+    for filePath in builtFilesToUpdate:
+        with open(
+            filePath,
+            "r",
+            encoding="utf-8"
+        ) as f:
             text = f.read()
-        for old, new in hashed_map.items():
+
+        for old, new in hashedMap.items():
             text = text.replace(old, new)
-        with open(file_path, 'w', encoding='utf-8') as f:
+
+        with open(
+            filePath,
+            "w",
+            encoding="utf-8"
+        ) as f:
             f.write(text)
 
     print("Updated references in HTML and JS files.")
     print("Done.")
 
+
 def main():
-    if os.path.exists(build_dir):
-        shutil.rmtree(build_dir)
-    os.makedirs(build_dir, exist_ok=True)
-    minify_all()
-    hash_and_update_refs()
+    if os.path.exists(buildDir):
+        shutil.rmtree(buildDir)
+
+    os.makedirs(buildDir, exist_ok=True)
+
+    minifyAll()
+    hashAndUpdateRefs()
+
 
 if __name__ == "__main__":
     main()

@@ -1,5 +1,5 @@
 import { status, initFlashcardHover, randomAnime } from './initializer.js';
-import { searchAnime, getTopRatedAnime, getMostPopularAnime, getGenres, genres } from '../api.js';
+import { BASE_URL, searchAnime, getTopRatedAnime, getMostPopularAnime, getGenres, genres } from '../api.js';
 import { createSection, createFlashcard } from './UIs.js';
 import { loadCSS, showLoader, hideLoader, updateMetaTags } from '../pages.js'
 const activeFilters = {};
@@ -126,7 +126,7 @@ export async function loadSearchPage() {
 
     const [path, query] = currentHash.split('?');
     if (path === '#/search' && !query) {
-      const allAnime = await searchAnime('https://api.jikan.moe/v4/anime?page=1');
+      const allAnime = await searchAnime(`${BASE_URL}/anime?page=1`);
       if (currentHash !== '#/search') return;
       displaySearchResults(allAnime);
       const searchResultsContainer = document.getElementById('search-results');
@@ -277,7 +277,7 @@ async function handleSearch(updateURL = true) {
 }
 
 export async function constructURL(updateURL = false) {
-  const baseURL = 'https://api.jikan.moe/v4/anime';
+  const baseURL = `${BASE_URL}/anime`;
   const params = new URLSearchParams();
 
   for (const filter in activeFilters) {
@@ -292,9 +292,9 @@ export async function constructURL(updateURL = false) {
 
   if (!params.toString()) return null;
 
-  const JikanURL = `${baseURL}?${params.toString()}`;
+  const targetApiURL = `${baseURL}?${params.toString()}`;
   if (updateURL) window.location.hash = `#/search?${params.toString()}`;
-  return JikanURL;
+  return targetApiURL;
 }
 
 export function applyFilters() {
