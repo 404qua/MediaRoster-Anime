@@ -7,8 +7,8 @@ const activeFilters = {};
 export async function loadSearchPage() {
     document.title = 'Search for Anime';
     updateMetaTags(
-      'Search for anime on MediaRoster. Use filters to find the exact anime you are looking for.',
-      ['mediaroster', 'anime', 'anime list', 'AnimeList', 'Anime keywords', 'list', 'roster', 'home', 'media', 'anim', 'search', 'filter']
+        'Search for anime on MediaRoster. Use filters to find the exact anime you are looking for.',
+        ['mediaroster', 'anime', 'anime list', 'AnimeList', 'Anime keywords', 'list', 'roster', 'home', 'media', 'anim', 'search', 'filter']
     );
     const currentHash = window.location.hash;
     loadCSS('./css/search.css');
@@ -16,18 +16,37 @@ export async function loadSearchPage() {
     document.getElementById('navsearch').style.color = '#8960ff';
     document.getElementById('navhome').style.color = '#ddd';
     if (JSON.stringify(genres) === '{}') {
-      getGenres();
+        getGenres();
     }
     const content = document.getElementById('content');
     content.innerHTML = `
     <h1 class="search-title">Search across our databases and make your pick!</h1>
     <div class="search-container">
         <div class="search-bar">
-            <button class="filter-button"><i class="fas fa-filter"></i> Filters</button>
-            <div class="search-bar-content">
-                <input type="text" id="search-input" placeholder="Search for anime...">
-                <button id="search-button"><i class="fas fa-search"></i></button>
+            <div class="search-top">
+
+                <button class="filter-button">
+                    <i class="fas fa-filter"></i>
+                    Filters
+                </button>
+
+                <div class="search-bar-content">
+                    <input
+                        type="search"
+                        id="search-input"
+                        placeholder="Search for anime..."
+                        autocomplete="off"
+                        autocorrect="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                    >
+
+                    <button id="search-button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
             </div>
+            <div id="search-suggestions"></div>
         </div>
         <div class="filter-options" style="display: none;">
             <h2 class='filter-title'>Filter Options</h2>
@@ -41,6 +60,9 @@ export async function loadSearchPage() {
                         <button class="filter-btn" data-filter="type" data-value="special">Special</button>
                         <button class="filter-btn" data-filter="type" data-value="ona">ONA</button>
                         <button class="filter-btn" data-filter="type" data-value="music">Music</button>
+                        <button class="filter-btn" data-filter="type" data-value="cm">Commercial</button>
+                        <button class="filter-btn" data-filter="type" data-value="pv">Promotional Video</button>
+                        <button class="filter-btn" data-filter="type" data-value="tv_special">TV Special</button>
                     </div>
                 </div>
             </div>
@@ -126,46 +148,46 @@ export async function loadSearchPage() {
 
     const [path, query] = currentHash.split('?');
     if (path === '#/search' && !query) {
-      const allAnime = await searchAnime(`${BASE_URL}/anime?page=1`);
-      if (currentHash !== '#/search') return;
-      displaySearchResults(allAnime);
-      const searchResultsContainer = document.getElementById('search-results');
-      if (searchResultsContainer) {
+        const allAnime = await searchAnime(`${BASE_URL}/anime?page=1`);
         if (currentHash !== '#/search') return;
-        const topRatedSection = await createSection({
-          title: 'Top Rated Anime',
-          apiFunction: getTopRatedAnime,
-          cardType: 'top-rated',
-          containerClass: 'airing-container',
-          titleClass: 'airing-title',
-          galleryClass: 'gridGallery'
-        });
-        if (currentHash !== '#/search') return;
-        searchResultsContainer.insertAdjacentHTML('beforeend', topRatedSection)
-        if (currentHash !== '#/search') return;
-        const mostPopularSection = await createSection({
-          title: 'Most Popular Anime',
-          apiFunction: getMostPopularAnime,
-          cardType: 'most-popular',
-          containerClass: 'airing-container',
-          titleClass: 'airing-title',
-          galleryClass: 'gridGallery'
-        });
-        if (currentHash !== '#/search') return;
-        searchResultsContainer.insertAdjacentHTML('beforeend', mostPopularSection)
-      }
-  
-      if (currentHash === '#/search') {
-        initFlashcardHover();
-        document.getElementById('randomDiv').style.display = 'block';
-        randomAnime();
-        hideLoader();
-      }
-  
+        displaySearchResults(allAnime);
+        const searchResultsContainer = document.getElementById('search-results');
+        if (searchResultsContainer) {
+            if (currentHash !== '#/search') return;
+            const topRatedSection = await createSection({
+                title: 'Top Rated Anime',
+                apiFunction: getTopRatedAnime,
+                cardType: 'top-rated',
+                containerClass: 'airing-container',
+                titleClass: 'airing-title',
+                galleryClass: 'gridGallery'
+            });
+            if (currentHash !== '#/search') return;
+            searchResultsContainer.insertAdjacentHTML('beforeend', topRatedSection)
+            if (currentHash !== '#/search') return;
+            const mostPopularSection = await createSection({
+                title: 'Most Popular Anime',
+                apiFunction: getMostPopularAnime,
+                cardType: 'most-popular',
+                containerClass: 'airing-container',
+                titleClass: 'airing-title',
+                galleryClass: 'gridGallery'
+            });
+            if (currentHash !== '#/search') return;
+            searchResultsContainer.insertAdjacentHTML('beforeend', mostPopularSection)
+        }
+
+        if (currentHash === '#/search') {
+            initFlashcardHover();
+            document.getElementById('randomDiv').style.display = 'block';
+            randomAnime();
+            hideLoader();
+        }
+
     } else {
-      console.log(`Search initiated with query: ${query}`);
+        console.log(`Search initiated with query: ${query}`);
     }
-  }
+}
 
 function loadPagination(paginationData, containerEl) {
     if (!containerEl) return;
@@ -180,6 +202,7 @@ function loadPagination(paginationData, containerEl) {
         if (enabled) {
             btn.addEventListener('click', () => {
                 const params = getSafeParams();
+                console.log(`Current params before setting page: ${params.toString()}`);
                 params.set('page', page);
                 const hash = `#/search?${params.toString() || `page=${page}`}`
                 window.location.hash = hash;
@@ -199,6 +222,7 @@ function loadPagination(paginationData, containerEl) {
     containerEl.appendChild(createButton('>>', last_visible_page, current_page < last_visible_page));
 }
 export async function displaySearchResults(searchResults) {
+    document.title = activeFilters.q ? `Search : ${activeFilters.q}` : 'Search for Anime';
     const container = document.getElementById('search-results');
     if (!container) return;
     container.innerHTML = '';
@@ -229,102 +253,190 @@ export async function displaySearchResults(searchResults) {
 }
 
 export async function initSearch() {
-  const params = getSafeParams();
-  for (const key in activeFilters) delete activeFilters[key];
-  for (const [key, value] of params.entries()) {
-    if (key === 'genres') {
-        activeFilters[key] = value.split(',');
-    } else {
-        activeFilters[key] = value;
+    const params = getSafeParams();
+    console.log(`Current params on init: ${params.toString()}`);
+    for (const key in activeFilters) delete activeFilters[key];
+    for (const [key, value] of params.entries()) {
+        if (key === 'genres' || key === 'type' || key === 'rating') {
+            activeFilters[key] = value.split(',');
+        } else {
+            activeFilters[key] = value;
+        }
     }
-  }
 
-  applyFilters();
-  
-  const searchBtn = document.getElementById('search-button');
-  if (searchBtn) searchBtn.addEventListener('click', () => {
-      delete activeFilters['page'];
-      constructURL(true);
-  });
+    applyFilters();
 
-  const searchIn = document.getElementById('search-input');
-  searchIn.addEventListener('input', () => {
-      activeFilters.q = searchIn.value; // store raw input; sanitized via getSafeParams later
-  });
-  searchIn.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-          delete activeFilters['page'];
-          constructURL(true);
-      }
-  });
+    const searchBtn = document.getElementById('search-button');
+    if (searchBtn) searchBtn.addEventListener('click', () => {
+        delete activeFilters['page'];
+        constructURL(true);
+    });
 
-  if (params.toString()) handleSearch(false);
+    const searchIn = document.getElementById('search-input');
+    let suggestionTimer;
+
+    searchIn.addEventListener('input', () => {
+        const query = searchIn.value.trim();
+        activeFilters.q = query;
+        clearTimeout(suggestionTimer);
+
+        suggestionTimer = setTimeout(() => {
+            showSearchSuggestions(query);
+        }, 300);
+    });
+    searchIn.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            delete activeFilters['page'];
+            constructURL(true);
+        }
+    });
+
+    if (params.toString()) handleSearch(false);
 }
 
+let suggestionReq = 0;
+async function showSearchSuggestions(query) {
+    const id = ++suggestionReq;
+    const suggestionsContainer = document.getElementById('search-suggestions');
+    if (!suggestionsContainer) return;
+    if (!query) {
+        suggestionsContainer.style.display = 'none'
+        return
+    };
+    const searchURL = await constructURL(false);
+    if (!searchURL) {
+        suggestionsContainer.style.display = 'none'
+        return;
+    }
+
+    try {
+        const results = await searchAnime(searchURL);
+        if (suggestionReq !== id) {
+            return
+        }
+        if (!results?.data?.length) {
+            suggestionsContainer.innerHTML = `
+            <div class='no-suggestion'>
+                No matching results
+            </div>
+            `
+            suggestionsContainer.style.display = 'block';
+            return;
+        }
+
+        suggestionsContainer.innerHTML = `${results.data.slice(0, 5).map(anime => `
+        <a href="#/details-${anime.mal_id}" class="search-suggestion">
+            <img src="${anime.images?.webp?.image_url || anime.images?.jpg?.image_url || 'placeholder.png'}" alt="${anime.title}">
+
+            <div class="search-suggestion-info">
+
+                <div class="search-suggestion-title-row">
+                    <div class="search-suggestion-rank">
+                        <span style="font-weight: bold; color: gold"># ${anime.rank}</span>
+                    </div>
+
+                    <div class="search-suggestion-title">
+                        ${anime.title}
+                    </div>
+                </div>
+
+                <div class="search-suggestion-meta">
+
+                    <div>
+                        <i class="fas fa-video"></i>
+                        ${anime.type}
+                    </div>
+
+                    <div>
+                        <i class="fas fa-user-group"></i>
+                        ${anime.members?.toLocaleString()}
+                    </div>
+
+                    <div>
+                        <i class="fas fa-star"></i>
+                        ${anime.score}
+                    </div>
+
+                    <div>
+                        <i class="fas fa-shield-alt"></i>
+                        ${anime.rating}
+                    </div>
+
+                </div>
+            </div>
+        </a>
+        `).join('')}`;
+        suggestionsContainer.style.display = 'block';
+    } catch (error) {
+        console.error('Error fetching search suggestions:', error);
+    }
+};
+
 async function handleSearch(updateURL = true) {
-  const url = await constructURL(updateURL);
-  const container = document.getElementById('search-results');
-  if (!container) return;
-  container.innerHTML = `<div class="loader" style="display: flex; justify-content: center; align-items: center; width:100%;">
+    const url = await constructURL(updateURL);
+    const container = document.getElementById('search-results');
+    if (!container) return;
+    container.innerHTML = `<div class="loader" style="display: flex; justify-content: center; align-items: center; width:100%;">
                             <div class="dot"></div>
                             <div class="dot"></div>
                             <div class="dot"></div>
                          </div>`;
-  if (url) {
-      const results = await searchAnime(url);
-      displaySearchResults(results);
-  }
+    if (url) {
+        const results = await searchAnime(url);
+        displaySearchResults(results);
+    }
 }
 
 export async function constructURL(updateURL = false) {
-  const baseURL = `${BASE_URL}/anime`;
-  const params = new URLSearchParams();
+    const baseURL = `${BASE_URL}/anime`;
+    const params = new URLSearchParams();
 
-  for (const filter in activeFilters) {
-      let value = activeFilters[filter];
-      if (filter === 'q') {
-          value = value.replace(/[^\p{L}\p{N}\s\-_.:'"|#]/gu, '').slice(0, 100);
-          document.title = value || 'Search for Anime';
-      }
-      if (Array.isArray(value)) params.append(filter, value.join(','));
-      else params.append(filter, value);
-  }
+    for (const filter in activeFilters) {
+        let value = activeFilters[filter];
+        if (filter === 'q') {
+            value = value.replace(/[^\p{L}\p{N}\s\-_.:'"|#]/gu, '').slice(0, 100);
+        }
+        if (Array.isArray(value)) params.append(filter, value.join(','));
+        else params.append(filter, value);
+    }
 
-  if (!params.toString()) return null;
+    if (!params.toString()) return null;
 
-  const targetApiURL = `${baseURL}?${params.toString()}`;
-  if (updateURL) window.location.hash = `#/search?${params.toString()}`;
-  return targetApiURL;
+    const targetApiURL = `${baseURL}?${params.toString()}`;
+    if (updateURL) {
+        window.location.hash = `#/search?${params.toString()}`;
+    }
+    return targetApiURL;
 }
 
 export function applyFilters() {
-  document.querySelectorAll('[class*="active"]').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('[class*="active"]').forEach(el => el.classList.remove('active'));
 
-  const IdFilters = ['order_by', 'sort', 'min_score', 'max_score'];
+    const IdFilters = ['order_by', 'sort', 'min_score', 'max_score'];
 
-  for (const key in activeFilters) {
-      const value = activeFilters[key];
-      if (key === 'q') {
-          const input = document.getElementById('search-input');
-          if (input) input.value = value;
-      } else if (key === 'genres') {
-          value.forEach(v => {
-              const btn = document.querySelector(`[data-filter='${key}'][data-value='${v}']`);
-              if (btn) btn.classList.add('active');
-          });
-      } else if (key === 'page') {
-          // No UI element to update for page number
-      } else if (key === 'sfw') {
-        const checkbox = document.getElementById('sfw-checkbox');
-        if (checkbox) checkbox.checked = false;
-      } else if (IdFilters.includes(key)) {
-          const elem = document.getElementById(key);
-          if (elem) elem.value = value;
-      } else {
-          const elem = document.querySelector(`[data-filter='${key}'][data-value='${value}']`);
-          if (elem) elem.classList.add('active');
-      }
-  }
+    for (const key in activeFilters) {
+        const value = activeFilters[key];
+        if (key === 'q') {
+            const input = document.getElementById('search-input');
+            if (input) input.value = value;
+        } else if (key === 'genres' || key === 'type' || key === 'rating') {
+            value.forEach(v => {
+                const btn = document.querySelector(`[data-filter='${key}'][data-value='${v}']`);
+                if (btn) btn.classList.add('active');
+            });
+        } else if (key === 'page') {
+            // No UI element to update for page number
+        } else if (key === 'sfw') {
+            const checkbox = document.getElementById('sfw-checkbox');
+            if (checkbox) checkbox.checked = false;
+        } else if (IdFilters.includes(key)) {
+            const elem = document.getElementById(key);
+            if (elem) elem.value = value;
+        } else {
+            const elem = document.querySelector(`[data-filter='${key}'][data-value='${value}']`);
+            if (elem) elem.classList.add('active');
+        }
+    }
 }
 
 export function initFilters() {
@@ -342,7 +454,7 @@ export function initFilters() {
         btn.addEventListener('click', () => {
             const filter = btn.dataset.filter;
             const value = btn.dataset.value;
-            const singleSelectGroups = ["season", "status", "type", "rating"];
+            const singleSelectGroups = ["season", "status"];
 
             if (singleSelectGroups.includes(filter)) {
                 document.querySelectorAll(`.filter-btn[data-filter="${filter}"]`).forEach(b => b.classList.remove('active'));
@@ -385,13 +497,13 @@ export function initFilters() {
     });
     const sfw = document.getElementById('sfw-checkbox');
     sfw.addEventListener('change', () => {
-      if (!sfw.checked || !activeFilters.sfw) {
-        activeFilters.sfw = 'true';
-        sfw.checked = false;
-      } else {
-        delete activeFilters.sfw
-        sfw.checked = true;
-      }
+        if (!sfw.checked || !activeFilters.sfw) {
+            activeFilters.sfw = 'true';
+            sfw.checked = false;
+        } else {
+            delete activeFilters.sfw
+            sfw.checked = true;
+        }
     });
 }
 
@@ -425,46 +537,56 @@ export async function renderGenres() {
 };
 
 const allowed_filters = new Set([
-  'q', 'page', 'genres', 'min_score', 'max_score',
-  'status', 'type', 'rating', 'order_by', 'sort', 'sfw'
+    'q', 'page', 'genres', 'min_score', 'max_score',
+    'status', 'season', 'type', 'rating', 'order_by', 'sort', 'sfw'
 ]);
 
 const ENUMS = {
-  status: new Set(['airing','complete','upcoming']),
-  type: new Set(['tv','movie','ova','special']),
-  rating: new Set(['g','pg','pg13','r','r17','rx']),
-  order_by: new Set(['title','score','popularity','favorites','members','episodes']),
-  sort: new Set(['asc','desc'])
+    status: new Set(['airing', 'complete', 'upcoming']),
+    season: new Set(['winter', 'spring', 'summer', 'fall']),
+    type: new Set(['tv', 'movie', 'ova', 'special', 'ona', 'music', 'cm', 'pv', 'tv_special']),
+    rating: new Set(['g', 'pg', 'pg13', 'r', 'r17', 'rx']),
+    order_by: new Set(['title', 'score', 'popularity', 'favorites', 'members', 'episodes']),
+    sort: new Set(['asc', 'desc'])
 };
-  
-export function getSafeParams() {
-  const raw = new URLSearchParams(window.location.hash.split('?')[1] || '');
-  console.log(`raw : ${raw}`)
-  const safe = new URLSearchParams();
 
-  for (const [key, value] of raw.entries()) {
-    if (!allowed_filters.has(key)) continue;
-    if (key === 'q') {
-      const cleanQ = value.replace(/[^\p{L}\p{N}\s\-_.:'"|#]/gu, '').slice(0, 100);
-      safe.set('q', cleanQ);
-    } else if (['min_score','max_score'].includes(key)) {
-      const n = parseInt(value, 10);
-      if (Number.isFinite(n) && n >= 0 && n <= 10) safe.set(key, String(n));
-    } else if (key === 'page') {
-      const n = parseInt(value, 10);
-      if (Number.isFinite(n) && n >= 1 && n <= 1000) safe.set(key, String(n));
-    } else if (key === 'genres') {
-      const ids = value.split(',')
-        .map(v => parseInt(v, 10))
-        .filter(n => Number.isFinite(n) && n > 0);
-      if (ids.length) safe.set('genres', ids.join(','));
-    } else if (key==='sfw') {
-      safe.set('sfw', value);
-    } else if (ENUMS[key]) {
-      const norm = value.toLowerCase();
-      if (ENUMS[key].has(norm)) safe.set(key, norm);
+export function getSafeParams() {
+    const raw = new URLSearchParams(window.location.hash.split('?')[1] || '');
+    console.log(`raw : ${raw}`)
+    const safe = new URLSearchParams();
+
+    for (const [key, value] of raw.entries()) {
+        if (!allowed_filters.has(key)) continue;
+        if (key === 'q') {
+            const cleanQ = value.replace(/[^\p{L}\p{N}\s\-_.:'"|#]/gu, '').slice(0, 100);
+            safe.set('q', cleanQ);
+        } else if (['min_score', 'max_score'].includes(key)) {
+            const n = parseFloat(value, 10);
+            if (Number.isFinite(n) && n >= 0 && n <= 10) safe.set(key, String(n));
+        } else if (key === 'page') {
+            const n = parseInt(value, 10);
+            if (Number.isFinite(n) && n >= 1 && n <= 1000) safe.set(key, String(n));
+        } else if (key === 'genres') {
+            const ids = value.split(',')
+                .map(v => parseInt(v, 10))
+                .filter(n => Number.isFinite(n) && n > 0);
+            if (ids.length) safe.set(`${key}`, ids.join(','));
+        } else if (key === 'type' || key === 'rating') {
+            const vals = value
+                .split(',')
+                .map(v => v.toLowerCase())
+                .filter(v => ENUMS[key].has(v));
+
+            if (vals.length) {
+                safe.set(key, vals.join(','));
+            }
+        } else if (key === 'sfw') {
+            safe.set('sfw', value);
+        } else if (ENUMS[key]) {
+            const norm = value.toLowerCase();
+            if (ENUMS[key].has(norm)) safe.set(key, norm);
+        }
     }
-  }
-  console.log(`safe : ${safe}`)
-  return safe;
+    console.log(`safe : ${safe}`)
+    return safe;
 };

@@ -1,294 +1,345 @@
 <!doctype html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MediaRoster: Anime</title>
     <style>
-  body::-webkit-scrollbar {
-     display: none;
-}
- html {
-     -ms-overflow-style: none;
-     scrollbar-width: none;
-}
- * {
-     box-sizing: border-box;
-}
- :root {
-     --darker-accent: #6a48cc;
-     --primary-accent: #8960ff;
-     --secondary-accent: #cf80ee;
-     --lighter-accent: #d9a2f5;
-     --lightest-accent: #d9a2f5;
-     --text-color: #ddd;
-     --bg-color-primary: #1a1a1a;
-     --bg-color-secondary: #242424;
-     --border-color: #333;
-     --icon-color: #445599;
-     --error-color: #ff6b6b;
-     --loader-color: #8960ff;
-     --hover-primary-accent: #6a48cc;
-     --warning-color: #ddab5b;
-     --bg-color-mid: #1f1f1f;
-     --bg-color-trans: #212121;
-}
- html {
-     background-color: var(--bg-color-primary);
-     overflow-x: hidden;
-}
- body {
-     font-family: sans-serif;
-     margin: 0;
-     background-color: var(--bg-color-primary);
-     color: var(--text-color);
-     display: flex;
-     flex-direction: column;
-     min-height: 100vh;
-     overflow-x: hidden;
-}
- header {
-     background-color: rgba(36,36,36,0.71);
-     padding: 0.5vh 0.1rem;
-     border-bottom: 1px solid var(--border-color);
-     position: fixed;
-     top: 0;
-     z-index: 10;
-     width: 100%;
-     backdrop-filter: blur(25px) brightness(200%);
-     -webkit-backdrop-filter: blur(25px) brightness(200%);
-     min-height: 7vh;
-     max-height: 9vh;
-}
- nav {
-     display: flex;
-     justify-content: space-between;
-     align-items: center;
-}
- .nav-left {
-     display: flex;
-     align-items: center;
-}
- .hamburger {
-     display: flex;
-     align-items: center;
-     justify-content: center;
-     height: 6.5vh;
-     width: 6.5vh;
-     cursor: pointer;
-     margin-right: 0.5rem;
-}
- .hamburger i {
-     font-size: 5vh;
-}
- .nav-title {
-     display: flex;
-     align-items: center;
-}
- .nav-title .logo {
-     width: 6.5vh;
-     height: 6.5vh;
-     margin-right: 0.5rem;
-}
- .nav-title .title a {
-     font-size: 6vh;
-     font-weight: bold;
-     color: var(--primary-accent);
-     text-decoration: none;
-}
- .nav-title .title a:hover {
-     cursor: pointer;
-}
- nav ul {
-     list-style: none;
-     margin: 0;
-     padding: 0;
-     display: flex;
-     margin-right: 2rem;
-}
- nav ul li {
-     margin-left: 1.5rem;
-}
- nav ul li a {
-     color: var(--text-color);
-     text-decoration: none;
-     font-size: 3vh;
-     transition: color 0.3s;
-     display: flex;
-     align-items: center;
-}
- nav ul li a i {
-     margin-right: 0.5rem;
-}
- nav ul li a:hover {
-     color: var(--primary-accent);
-}
- nav ul li a.active {
-     color: var(--primary-accent);
-}
- .nav-text-desktop {
-     display: inline;
-}
- .nav-text-mobile {
-     display: none;
-}
- .nav-links-visible {
-     display: flex;
-}
- .nav-links-menu {
-     display: none;
-     flex-direction: column;
-     position: absolute;
-     top: 100%;
-     left: 0;
-     width: 100%;
-     background-color: var(--bg-color-secondary);
-     text-align: left;
-     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-     padding: 0;
-}
- .nav-links-menu.nav-active {
-     display: flex;
-}
- .nav-links-menu li {
-     margin: 0;
-     border-bottom: 1px solid var(--border-color);
-}
- .nav-links-menu li:last-child {
-     border-bottom: none;
-}
- .nav-links-menu li a {
-     padding: 1rem 1.5rem;
-     width: 100%;
-     box-sizing: border-box;
-}
- footer {
-     background-color: var(--bg-color-secondary);
-     padding: 0.5rem;
-     border-top: 1px solid var(--border-color);
-}
- .footer-container {
-     display: flex;
-     justify-content: space-between;
-     align-items: flex-start;
-     max-width: 1200px;
-     margin: 0 auto;
-}
- .footer-left {
-     text-align: left;
-}
- .footer-right {
-     text-align: justify;
-     margin-left: none;
-     margin-right: none;
-     align-self: normal;
-     width: 50%;
-}
- .footer-right h4 {
-     margin-top: 0;
-     color: var(--primary-accent);
-}
- .social-links a {
-     color: var(--text-color);
-     margin: 0 0.5rem;
-     font-size: 1.5rem;
-     transition: all 0.2s ease-in-out;
-     display: inline-block;
-}
- .social-links a:hover {
-     color: var(--primary-accent);
-     transform: scale(1.4);
-}
- .footer-left p a {
-     color: var(--primary-accent);
-     transition: all 0.2s ease-in-out;
-     text-decoration: none;
-     display: inline-block;
-}
- .footer-left p a:hover {
-     color: var(--primary-accent);
-     transform: scale(1.3) translateX(5px);
-}
- main {
-     padding-top: 7vh;
-}
- @media (max-width: 900px) {
-    header {
-        padding: 0.5vh 0.07rem;
-        position: fixed;
-        width: 100%;
-    }
-    main {
-        padding-top: 7vh;
-    }
-     nav {
-         position: relative;
-         justify-content: space-between;
-         padding: 0 1rem;
-         min-height: 7vh;
-    }
-     .nav-left {
-         position: static;
-    }
-     .nav-title {
-         position: static;
-    }
-     .nav-title .logo {
-         width: 6vh;
-         height: 6vh;
-    }
-     .nav-links-visible {
-         display: none;
-    }
-     .hamburger {
-         display: flex;
-         position: static;
-    }
-     .hamburger i {
-         font-size: 5vh;
-    }
-     .footer-container {
-         max-width: 1200px;
-         margin: 0 auto;
-         display: block;
-    }
-     .footer-left {
-         text-align: center;
-    }
-     .footer-right {
-         display: block;
-         align-self: center;
-         text-align: justify;
-         width: 75%;
-         margin-left: auto;
-         margin-right: auto;
-    }
-}
+        body::-webkit-scrollbar {
+            display: none;
+        }
 
-@media (max-width: 550px) {
-    .nav-title .title a {
-        font-size: 9vw;
-    }
-    .hamburger i {
-        font-size: 11vw;
-    }
-    .hamburger {
-        width: 12vw;
-        height: 12vw;
-    }
-    nav {
-        justify-content: space-between;
-        align-items: center;
-    }
-    .nav-left {
-        display: flex;
-        align-items: center;
-    }
-    .logo {
-        width: 12vw;
-        height: 12vw;
-    }
-}
+        html {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+            background-color: var(--bg-color-primary);
+            overflow-x: hidden;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --darker-accent: #6a48cc;
+            --primary-accent: #8960ff;
+            --secondary-accent: #cf80ee;
+            --lighter-accent: #d9a2f5;
+            --lightest-accent: #d9a2f5;
+            --text-color: #ddd;
+            --bg-color-primary: #1a1a1a;
+            --bg-color-secondary: #242424;
+            --border-color: #333;
+            --icon-color: #445599;
+            --error-color: #ff6b6b;
+            --loader-color: #8960ff;
+            --hover-primary-accent: #6a48cc;
+            --warning-color: #ddab5b;
+            --bg-color-mid: #1f1f1f;
+            --bg-color-trans: #212121;
+        }
+
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            background-color: var(--bg-color-primary);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        header {
+            background-color: rgba(36, 36, 36, 0.71);
+            padding: 0.5vh 0.1rem;
+            border-bottom: 1px solid var(--border-color);
+            position: fixed;
+            top: 0;
+            z-index: 10000;
+            width: 100%;
+            backdrop-filter: blur(25px) brightness(200%);
+            -webkit-backdrop-filter: blur(25px) brightness(200%);
+            min-height: 7vh;
+            max-height: 9vh;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .hamburger {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 6.5vh;
+            width: 6.5vh;
+            cursor: pointer;
+            margin-right: 0.5rem;
+        }
+
+        .hamburger i {
+            font-size: 5vh;
+        }
+
+        .nav-title {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-title .logo {
+            width: 6.5vh;
+            height: 6.5vh;
+            margin-right: 0.5rem;
+        }
+
+        .nav-title .title a {
+            font-size: 6vh;
+            font-weight: bold;
+            color: var(--primary-accent);
+            text-decoration: none;
+        }
+
+        .nav-title .title a:hover {
+            cursor: pointer;
+        }
+
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            margin-right: 2rem;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 3vh;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+        }
+
+        nav ul li a i {
+            margin-right: 0.5rem;
+        }
+
+        nav ul li a:hover {
+            color: var(--primary-accent);
+        }
+
+        nav ul li a.active {
+            color: var(--primary-accent);
+        }
+
+        .nav-text-desktop {
+            display: inline;
+        }
+
+        .nav-text-mobile {
+            display: none;
+        }
+
+        .nav-links-visible {
+            display: flex;
+        }
+
+        .nav-links-menu {
+            display: none;
+            flex-direction: column;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background-color: var(--bg-color-secondary);
+            text-align: left;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 0;
+        }
+
+        .nav-links-menu.nav-active {
+            display: flex;
+        }
+
+        .nav-links-menu li {
+            margin: 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-links-menu li:last-child {
+            border-bottom: none;
+        }
+
+        .nav-links-menu li a {
+            padding: 1rem 1.5rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        footer {
+            background-color: var(--bg-color-secondary);
+            padding: 0.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-left {
+            text-align: left;
+        }
+
+        .footer-right {
+            text-align: justify;
+            align-self: normal;
+            width: 50%;
+        }
+
+        .footer-right h4 {
+            margin-top: 0;
+            color: var(--primary-accent);
+        }
+
+        .social-links a {
+            color: var(--text-color);
+            margin: 0 0.5rem;
+            font-size: 1.5rem;
+            transition: all 0.2s ease-in-out;
+            display: inline-block;
+        }
+
+        .social-links a:hover {
+            color: var(--primary-accent);
+            transform: scale(1.4);
+        }
+
+        .footer-left p a {
+            color: var(--primary-accent);
+            transition: all 0.2s ease-in-out;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .footer-left p a:hover {
+            color: var(--primary-accent);
+            transform: scale(1.3) translateX(5px);
+        }
+
+        main {
+            padding-top: 7vh;
+        }
+
+        @media (max-width: 900px) {
+            header {
+                padding: 0.5vh 0.07rem;
+                position: fixed;
+                width: 100%;
+            }
+
+            main {
+                padding-top: 7vh;
+            }
+
+            nav {
+                position: relative;
+                justify-content: space-between;
+                padding: 0 1rem;
+                min-height: 7vh;
+            }
+
+            .nav-left {
+                position: static;
+            }
+
+            .nav-title {
+                position: static;
+            }
+
+            .nav-title .logo {
+                width: 6vh;
+                height: 6vh;
+            }
+
+            .nav-links-visible {
+                display: none;
+            }
+
+            .hamburger {
+                display: flex;
+                position: static;
+            }
+
+            .hamburger i {
+                font-size: 5vh;
+            }
+
+            .footer-container {
+                max-width: 1200px;
+                margin: 0 auto;
+                display: block;
+            }
+
+            .footer-left {
+                text-align: center;
+            }
+
+            .footer-right {
+                display: block;
+                align-self: center;
+                text-align: justify;
+                width: 75%;
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+
+        @media (max-width: 550px) {
+            .nav-title .title a {
+                font-size: 9vw;
+            }
+
+            .hamburger i {
+                font-size: 11vw;
+            }
+
+            .hamburger {
+                width: 12vw;
+                height: 12vw;
+            }
+
+            nav {
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .nav-left {
+                display: flex;
+                align-items: center;
+            }
+
+            .logo {
+                width: 12vw;
+                height: 12vw;
+            }
+        }
     </style>
     <link rel="icon" href="./media/logo.webp">
     <link rel="stylesheet" href="./css/style.css">
@@ -311,6 +362,7 @@
     <link rel="preload" href="./media/naruto.webp" as="image" fetchpriority="low">
     <link rel="preload" href="./media/slime.webp" as="image" fetchpriority="low">
 </head>
+
 <body>
     <header id="head" class="head">
         <nav id="navbar">
@@ -324,19 +376,30 @@
                 </div>
             </div>
             <ul class="nav-links-visible">
-                <li><a href="#/" id="navhome"><i class="fas fa-home"></i><span class="nav-text-desktop"> Home</span></a></li>
-                <li><a href="#/search" id="navsearch"><i class="fas fa-search"></i><span class="nav-text-desktop"> Search</span></a></li>
-                <li><a href="#/say-hi" id="navsayhi"><i class="fas fa-hand-wave"></i><span class="nav-text-desktop"> Say Hi!</span></a></li>
+                <li><a href="#/" id="navhome"><i class="fas fa-home"></i><span class="nav-text-desktop"> Home</span></a>
+                </li>
+                <li><a href="#/search" id="navsearch"><i class="fas fa-search"></i><span class="nav-text-desktop">
+                            Search</span></a></li>
+                <li><a href="#/say-hi" id="navsayhi"><i class="fas fa-hand-wave"></i><span class="nav-text-desktop"> Say
+                            Hi!</span></a></li>
             </ul>
             <ul class="nav-links-menu">
-                <li><a href="#/" id="navhome-menu"><i class="fas fa-home"></i><span class="nav-text-desktop"> Home</span></a></li>
-                <li><a href="#/search" id="navsearch-menu"><i class="fas fa-search"></i><span class="nav-text-desktop"> Search</span></a></li>
-                <li><a href="#/say-hi" id="navsayhi-menu"><i class="fas fa-hand-wave"></i><span class="nav-text-desktop"> Say Hi!</span></a></li>
-                <li><a href="#/404" id="navmovies"><i class="fas fa-film"></i><span class="nav-text-desktop"> Movies and Shows</span></a></li>
-                <li><a href="#/404" id="navbooks"><i class="fas fa-book"></i><span class="nav-text-desktop"> Books</span></a></li>
-                <li><a href="#/404" id="navmanga"><i class="fas fa-book-open"></i><span class="nav-text-desktop"> Manga</span></a></li>
-                <li><a href="#/404" id="navgames"><i class="fas fa-gamepad"></i><span class="nav-text-desktop"> Games</span></a></li>
-                <li><a href="#/" id="navanime" class="active"><i class="fas fa-tv"></i><span class="nav-text-desktop"> Anime</span></a></li>
+                <li><a href="#/" id="navhome-menu"><i class="fas fa-home"></i><span class="nav-text-desktop">
+                            Home</span></a></li>
+                <li><a href="#/search" id="navsearch-menu"><i class="fas fa-search"></i><span class="nav-text-desktop">
+                            Search</span></a></li>
+                <li><a href="#/say-hi" id="navsayhi-menu"><i class="fas fa-hand-wave"></i><span
+                            class="nav-text-desktop"> Say Hi!</span></a></li>
+                <li><a href="#/404" id="navmovies"><i class="fas fa-film"></i><span class="nav-text-desktop"> Movies and
+                            Shows</span></a></li>
+                <li><a href="#/404" id="navbooks"><i class="fas fa-book"></i><span class="nav-text-desktop">
+                            Books</span></a></li>
+                <li><a href="#/404" id="navmanga"><i class="fas fa-book-open"></i><span class="nav-text-desktop">
+                            Manga</span></a></li>
+                <li><a href="#/404" id="navgames"><i class="fas fa-gamepad"></i><span class="nav-text-desktop">
+                            Games</span></a></li>
+                <li><a href="#/" id="navanime" class="active"><i class="fas fa-tv"></i><span class="nav-text-desktop">
+                            Anime</span></a></li>
             </ul>
         </nav>
     </header>
@@ -354,7 +417,7 @@
     <div id="loader"></div>
     <div id="popup" hidden></div>
     <div id="flash-popup" hidden></div>
-    
+
     <footer id="foot" class="foot">
         <div class="footer-container">
             <div class="footer-left">
@@ -368,12 +431,17 @@
                 </div>
                 <p>Powered by <a href="https://tenrai.org" target="_blank">Tenrai API</a></p>
                 <p>Source: <a href="https://myanimelist.net/" target="_blank">MyAnimeList</a></p>
-                <p>This projecy is open source! Check it out on <a href="https://github.com/konal1019/MediaRoster-Anime" target="_blank">github</a></p>
+                <p>This projecy is open source! Check it out on <a href="https://github.com/konal1019/MediaRoster-Anime"
+                        target="_blank">github</a></p>
                 <p>&copy; 2025 MediaRoster.</p>
             </div>
             <div class="footer-right">
                 <h4>The Stupid reason this site exists</h4>
-                <p>So, it was a hot summer evening right after exams ended when I had that boost of motivation to make something. Naturally i hit up ma bro and asked him for an idea for a "simple python script". "Idk if it's possible but a script that will go thru the anime lists in any website (I mean any website of your choice, the user can't change it) and suggests you a random anime" he said. As you would expect I proceeded with making this full blown website after hearing that suggestion.</p>
+                <p>So, it was a hot summer evening right after exams ended when I had that boost of motivation to make
+                    something. Naturally i hit up ma bro and asked him for an idea for a "simple python script". "Idk if
+                    it's possible but a script that will go thru the anime lists in any website (I mean any website of
+                    your choice, the user can't change it) and suggests you a random anime" he said. As you would expect
+                    I proceeded with making this full blown website after hearing that suggestion.</p>
             </div>
         </div>
     </footer>
@@ -381,7 +449,7 @@
     <script>
         const hamburger = document.querySelector(".hamburger");
         const navLinksMenu = document.querySelector(".nav-links-menu");
-        
+
         const navhome = document.getElementById('navhome');
         const navsearch = document.getElementById('navsearch');
         const navsayhi = document.getElementById('navsayhi');
@@ -393,17 +461,17 @@
         const navmanga = document.getElementById('navmanga');
         const navgames = document.getElementById('navgames');
         const navanime = document.getElementById('navanime');
-        
+
         hamburger.addEventListener("click", () => {
             navLinksMenu.classList.toggle("nav-active");
         });
-        
+
         const closeMenu = () => {
             if (navLinksMenu.classList.contains('nav-active')) {
                 navLinksMenu.classList.remove('nav-active');
             }
         };
-        
+
         navhome.addEventListener('click', closeMenu);
         navsearch.addEventListener('click', closeMenu);
         navsayhi.addEventListener('click', closeMenu);
@@ -423,4 +491,5 @@
     <script type="module" src="./js/components/UIs.js"></script>
     <script type="module" src="./js/components/search.js"></script>
 </body>
+
 </html>

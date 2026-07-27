@@ -24,7 +24,7 @@ def main():
     print("3. Pushing to gh-pages...")
     try:
         build_commit = run_cmd(["git", "subtree", "split", "--prefix", "build", "HEAD"])
-        run_cmd(["git", "push", "origin", f"{build_commit}:gh-pages", "--force"])
+        run_cmd(["git", "push", "github", f"{build_commit}:gh-pages", "--force"])
     finally:
         print("4. Cleaning up temporary commit...")
         run_cmd(["git", "reset", "--hard", "HEAD~"])

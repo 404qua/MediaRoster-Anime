@@ -10,7 +10,7 @@ git commit -m "temp build commit"
 
 Write-Host "Pushing to gh-pages..."
 $BUILD_COMMIT = (git subtree split --prefix build HEAD).Trim()
-git push origin "${BUILD_COMMIT}:gh-pages" --force
+git push github "${BUILD_COMMIT}:gh-pages" --force
 
 Write-Host "Cleaning up temporary commit..."
 git reset --hard HEAD~

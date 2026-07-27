@@ -13,7 +13,7 @@ git commit -m "temp build commit"
 # 3. Push the build to gh-pages (force overwrite)
 echo "Pushing to gh-pages..."
 BUILD_COMMIT=$(git subtree split --prefix build HEAD)
-git push origin $BUILD_COMMIT:gh-pages --force
+git push github $BUILD_COMMIT:gh-pages --force
 
 # 4. Remove the temporary commit
 echo "Cleaning up temporary commit..."
