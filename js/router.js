@@ -3,8 +3,7 @@ import { loadDetailsPage } from './components/details.js';
 
 const routes = {
   '/': 'home',
-  '/search': 'search',
-  '/say-hi': 'portfolio',
+  '/search': 'search'
 };
 
 export const handleRoute = () => {
