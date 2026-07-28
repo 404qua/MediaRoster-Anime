@@ -47,66 +47,66 @@ const fetchWithCache = async (url, cacheKey) => {
 
     const maxRetries = 5;
     for (let retries = 0; retries < maxRetries; retries++) {
-      try {
-        console.log(`Fetching data for: ${url}`);
-        const response = await fetch(url, { method: 'GET' });
+        try {
+            console.log(`Fetching data for: ${url}`);
+            const response = await fetch(url, { method: 'GET' });
 
-        if (response.status !== 200 && response.status !== 304) {
-            logErrorByStatus(response.status, response.statusText);
-        } else {
-          const responseJSON = await response.json();
-          const data = responseJSON.data;
-          try {
-              localStorage.setItem(cacheKey, JSON.stringify({ data, timestamp: now }));
-          } catch (e) {
-            // yes this is actually necessary
-              if (e.name === 'QuotaExceededError') {
-                  console.warn('LocalStorage quota exceeded. Clearing oldest cache entries.');
-                  const cacheItems = Object.keys(localStorage).map(key => {
-                        try {
-                            const item = JSON.parse(localStorage.getItem(key));
-                            if (item && item.timestamp) {
-                                return { key, timestamp: item.timestamp };
+            if (response.status !== 200 && response.status !== 304) {
+                logErrorByStatus(response.status, response.statusText);
+            } else {
+                const responseJSON = await response.json();
+                const data = responseJSON.data;
+                try {
+                    localStorage.setItem(cacheKey, JSON.stringify({ data, timestamp: now }));
+                } catch (e) {
+                    // yes this is actually necessary
+                    if (e.name === 'QuotaExceededError') {
+                        console.warn('LocalStorage quota exceeded. Clearing oldest cache entries.');
+                        const cacheItems = Object.keys(localStorage).map(key => {
+                            try {
+                                const item = JSON.parse(localStorage.getItem(key));
+                                if (item && item.timestamp) {
+                                    return { key, timestamp: item.timestamp };
+                                }
+                            } catch (error) {
+                                // ignore for incorrect cache format
                             }
-                        } catch (error) {
-                            // ignore for incorrect cache format
+                            return null;
+                        }).filter(item => item !== null);
+
+                        cacheItems.sort((a, b) => a.timestamp - b.timestamp);
+                        const itemsToRemove = Math.min(5, cacheItems.length);
+                        for (let i = 0; i < itemsToRemove; i++) {
+                            console.log(`Removing old cache: ${cacheItems[i].key}`);
+                            localStorage.removeItem(cacheItems[i].key);
                         }
-                        return null;
-                    }).filter(item => item !== null);
 
-                  cacheItems.sort((a, b) => a.timestamp - b.timestamp);
-                  const itemsToRemove = Math.min(5, cacheItems.length);
-                  for (let i = 0; i < itemsToRemove; i++) {
-                      console.log(`Removing old cache: ${cacheItems[i].key}`);
-                      localStorage.removeItem(cacheItems[i].key);
-                  }
-
-                  try {
-                      localStorage.setItem(cacheKey, JSON.stringify({ data, timestamp: now }));
-                  } catch (e2) {
-                      console.error('Failed to cache data even after clearing some entries:', e2);
+                        try {
+                            localStorage.setItem(cacheKey, JSON.stringify({ data, timestamp: now }));
+                        } catch (e2) {
+                            console.error('Failed to cache data even after clearing some entries:', e2);
+                        }
+                    } else {
+                        console.error('Error saving to localStorage:', e);
                     }
-              } else {
-                  console.error('Error saving to localStorage:', e);
-              }
-          }
-          return data;
-        }
-        console.warn(`API request failed with status ${response.status}. Retrying...`);
-        await new Promise(resolve => setTimeout(resolve, (retries + 1) * 1000));
+                }
+                return data;
+            }
+            console.warn(`API request failed with status ${response.status}. Retrying...`);
+            await new Promise(resolve => setTimeout(resolve, (retries + 1) * 1000));
 
-      } catch (error) {
-        console.error(`Error fetching data from ${url}:`, error);
-        if (retries === maxRetries - 1) {
-            throw error;
+        } catch (error) {
+            console.error(`Error fetching data from ${url}:`, error);
+            if (retries === maxRetries - 1) {
+                throw error;
+            }
+            await new Promise(resolve => setTimeout(resolve, (retries + 1) * 1000));
         }
-        await new Promise(resolve => setTimeout(resolve, (retries + 1) * 1000));
-      }
     }
     throw new Error(`Failed to fetch data from ${url} after ${maxRetries} retries.`);
-  };
+};
 
-  const fetchWithoutCache = async (url) => {
+const fetchWithoutCache = async (url) => {
     const maxRetries = 5;
     for (let retries = 0; retries < maxRetries; retries++) {
         try {
@@ -132,7 +132,6 @@ const fetchWithCache = async (url, cacheKey) => {
     }
     throw new Error(`Failed to fetch data from ${url} after ${maxRetries} retries.`);
 };
-
 
 export const getTopRatedAnime = async () => {
     const url = `${BASE_URL}/top/anime`;
@@ -188,14 +187,16 @@ export const getAnimeInfo = async (animeId) => {
 
 export const getAnimeCharacters = async (animeId) => {
     const url = `${BASE_URL}/anime/${animeId}/characters`;
-    const cacheKey = `anime_characters_${animeId}`;
-    return await fetchWithoutCache(url);
+    const res = await fetchWithoutCache(url);
+    const data = await res.data;
+    return data
 };
 
 export const getAnimeStaff = async (animeId) => {
     const url = `${BASE_URL}/anime/${animeId}/staff`;
-    const cacheKey = `anime_staff_${animeId}`;
-    return await fetchWithoutCache(url, cacheKey);
+    const res = await fetchWithoutCache(url);
+    const data = await res.data;
+    return data
 };
 
 export const getRandomAnime = async () => {
@@ -204,7 +205,7 @@ export const getRandomAnime = async () => {
 };
 export const getAnimeReviews = async (animeId) => {
     const url = `${BASE_URL}/anime/${animeId}/reviews`;
-    const res =  await fetchWithoutCache(url);
+    const res = await fetchWithoutCache(url);
     return res.data;
 };
 

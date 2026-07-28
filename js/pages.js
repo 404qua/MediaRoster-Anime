@@ -9,7 +9,7 @@ export function loadPageContent(pageName) {
   document.getElementById('randomDiv').style.display = 'none';
   if (pageName === 'home') loadHomePage();
   else if (pageName === 'search') loadSearchPage();
-  else if (pageName === 'portfolio') window.location.href = 'https://github.com/konal1019';
+  else if (pageName === 'portfolio') window.location.href = 'https://github.com/aqua-flare';
   else load404();
 }
 

@@ -418,77 +418,154 @@ main {
   color: var(--error-color);
 }
 
+/* Review Popup */
 #popup {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: transparent;
-  backdrop-filter: blur(3px) brightness(50%);
+  inset: 0;
+  z-index: -10;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: -10;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
 }
 
-#popup-wrapper {
-  background: linear-gradient(135deg, rgba(40, 40, 50, 0.9), rgba(30, 30, 40, 0.9));
-  border-radius: 20px;
-  width: 80%;
-  height: 60%;
+#popup-content {
   position: relative;
-  padding: 15px;
-  box-sizing: border-box;
+  width: min(90vw, 700px);
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 2rem;
+  border-radius: 18px;
+
+  background: linear-gradient(135deg,
+      rgba(35, 35, 45, 0.98),
+      rgba(25, 25, 35, 0.98));
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.6),
+    0 0 25px rgba(255, 255, 255, 0.05);
+
+  color: var(--text-color);
 }
 
-#popup-content {
+#popup-content h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  margin: 0 2rem 1.5rem 0;
+  color: var(--lighter-accent);
+  font-size: 1.5rem;
+}
+
+#popup-content h3 .fa-star {
+  color: gold;
+}
+
+#popup-content p {
+  margin: 0;
+  line-height: 1.8;
+  white-space: pre-wrap;
   text-align: justify;
-  overflow: auto;
-  height: 100%;
-  scrollbar-gutter: stable;
-}
-
-#popup-content::-webkit-scrollbar {
-  width: 8px;
-}
-
-#popup-content::-webkit-scrollbar-thumb {
-  background-color: var(--darker-accent);
-  border-radius: 4px;
-}
-
-#popup-content::-webkit-scrollbar-track {
-  background-color: var(--bg-color-primary);
-  border-top-right-radius: 15px;
-  border-bottom-right-radius: 15px;
-}
-
-#popup-content {
-  /*firefox*/
-  scrollbar-width: thin;
-  scrollbar-color: var(--darker-accent) var(--bg-color-primary);
+  font-size: 1rem;
+  overflow-wrap: break-word;
 }
 
 #popup-close {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 1rem;
+  right: 1rem;
+
+  width: 40px;
+  height: 40px;
+
   border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: var(--text-color);
-  background: rgba(0, 0, 0, 0.2);
   border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  line-height: 30px;
-  text-align: center;
-  z-index: 10;
+
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-color);
+
+  font-size: 1.4rem;
+  font-weight: bold;
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease;
 }
 
 #popup-close:hover {
-  background: red;
+  transform: scale(1.1);
+  background: rgba(255, 80, 80, 0.25);
+}
+
+@media (max-width: 600px) {
+  #popup {
+    padding: 0.75rem;
+  }
+
+  #popup-content {
+    width: 100%;
+    max-height: 90vh;
+    padding: 1.5rem;
+    border-radius: 15px;
+  }
+
+  #popup-content h3 {
+    font-size: 1.2rem;
+    margin-right: 2.5rem;
+  }
+
+  #popup-content p {
+    font-size: 0.95rem;
+    line-height: 1.7;
+  }
+
+  #popup-close {
+    width: 36px;
+    height: 36px;
+    top: 0.75rem;
+    right: 0.75rem;
+  }
+}
+
+/* Popup Scrollbar */
+#popup-content {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-accent) rgba(255, 255, 255, 0.08);
+}
+
+#popup-content::-webkit-scrollbar {
+  width: 10px;
+}
+
+#popup-content::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 999px;
+  margin: 0.5rem;
+}
+
+#popup-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg,
+      var(--primary-accent),
+      var(--secondary-accent));
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+#popup-content::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg,
+      var(--lighter-accent),
+      var(--primary-accent));
+  background-clip: content-box;
+}
+
+#popup-content::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 /*flashcard popup*/

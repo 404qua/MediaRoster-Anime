@@ -23,21 +23,21 @@ export async function loadDetailsPage(animeId = null) {
   try {
     const isRandom = animeId === 'random';
     const anime = isRandom ? await getRandomAnime() : await getAnimeDetails(animeId);
-    
+
     if (!anime || !anime.mal_id) {
       throw new Error('Anime data not found.');
     }
-    
+
     animeId = anime.mal_id;
     document.title = anime.title_english || anime.title;
     const description = `Learn about ${anime.title_english || anime.title} on MediaRoster: ${(anime.synopsis || '').substring(0, 50)}...`;
     const keywords = [
-        anime.title,
-        anime.title_english,
-        ...(anime.titles?.map(t => t.title) || []),
-        ...(anime.genres?.map(g => g.name) || []),
-        'mediaroster', 'anime', 'details'
-    ].filter(Boolean); 
+      anime.title,
+      anime.title_english,
+      ...(anime.titles?.map(t => t.title) || []),
+      ...(anime.genres?.map(g => g.name) || []),
+      'mediaroster', 'anime', 'details'
+    ].filter(Boolean);
     console.log(`set meta Keywords:${keywords}, Description: ${description}`)
 
     updateMetaTags(description, [...new Set(keywords)]);
@@ -48,8 +48,8 @@ export async function loadDetailsPage(animeId = null) {
     }
 
     const titlesHTML = [
-        ...(anime.title_synonyms || []).map(s => `<li>${s}</li>`),
-        ...(anime.titles || []).map(t => `<li>${t.type}: ${t.title}</li>`)
+      ...(anime.title_synonyms || []).map(s => `<li>${s}</li>`),
+      ...(anime.titles || []).map(t => `<li>${t.type}: ${t.title}</li>`)
     ].join('');
 
     const genresHTML = (anime.genres && anime.genres.length > 0)
@@ -69,23 +69,54 @@ export async function loadDetailsPage(animeId = null) {
 
     const yearHTML = anime.year || 'N/A';
 
-    let embed = anime.trailer?.embed_url?.replace('&autoplay=1', '').replace('?autoplay=1', '') + '&modestbranding=1&showinfo=0&rel=0';
+
+    let embed;
+
+    if (anime.trailer?.embed_url) {
+      embed = anime.trailer.embed_url
+        .replace('&autoplay=1', '')
+        .replace('?autoplay=1', '') +
+        '&modestbranding=1&showinfo=0&rel=0';
+    }
+    else if (Math.floor(Math.random() * 50) > 0) {
+      embed = window.location.origin;
+    }
+    const isEgg = embed === window.location.origin;
     const trailerHTML = embed
       ? `
-        <div class="details-trailer">
-            <h2>Trailer</h2>
-            <div class="trailer-container">
-              <iframe
-                  loading="lazy"
-                  src="${embed}"
-                  frameborder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowfullscreen>
-              </iframe>
+    <div class="details-trailer">
+        <h2>${isEgg ? 'Trailer (?)' : 'Trailer'}</h2>
+        <div class="trailer-container ${isEgg ? 'trailer-egg' : ''}">
+            <iframe
+                loading="lazy"
+                src="${embed}"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen>
+            </iframe>
+
+            ${isEgg
+        ? `
+                <div class="egg-msg">
+                    <p>No luck with the trailer.</p>
+                    <p>Keep browsing instead.</p>
+                </div>
+                `
+        : ''
+      }
+        </div>
+    </div>
+    `
+      : `
+    <div class="details-trailer">
+        <h2>Trailer</h2>
+        <div class="trailer-container">
+            <div class="trailer-failure">
+                No trailer available
             </div>
         </div>
-        `
-      : '';
+    </div>
+    `;
     const relationsHTML = `<div class="loader"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
     const heroStatsHTML = `
         <div class="details-stats hero-stats">
@@ -294,7 +325,7 @@ async function loadRelations(relations, animeId) {
             if (animeInfo) {
               cardHTML = createFlashcard(animeInfo, 'top-rated');
             } else {
-              console.log(`no info ${animeInfo}`) 
+              console.log(`no info ${animeInfo}`)
               cardHTML = createFallbackCard(entry);
             }
           } catch (error) {
@@ -306,7 +337,7 @@ async function loadRelations(relations, animeId) {
           console.log('not anime')
           cardHTML = createFallbackCard(entry);
         }
-        
+
         if (window.location.hash !== currentHash) return;
         grid.insertAdjacentHTML('beforeend', cardHTML);
       }
@@ -351,16 +382,17 @@ async function loadCharecters(animeId) {
   } catch (error) {
     console.error('Failed to load characters:', error);
   }
+  console.log(charactersData)
 
   if (window.location.hash !== currentHash) return;
 
   const charContainer = document.getElementById('characters');
   if (charContainer) {
     charContainer.innerHTML = (charactersData && charactersData.length > 0)
-    ? `<div class="character-grid">${charactersData.map(char => {
-      const imgSrc = char.character.images.webp.image_url;
-      const isPlaceholder = imgSrc.includes('questionmark');
-      return `
+      ? `<div class="character-grid">${charactersData.map(char => {
+        const imgSrc = char.character.images.webp.image_url;
+        const isPlaceholder = imgSrc.includes('questionmark');
+        return `
       <div class="character-card">
           ${isPlaceholder ? '<div class="placeholder-icon"><i class="fas fa-user"></i></div>' : `<img src="${imgSrc}" loading="lazy" alt="${char.character.name}">`}
           <div class="character-info">
@@ -369,9 +401,9 @@ async function loadCharecters(animeId) {
               ${char.voice_actors && char.voice_actors.length > 0 ? `<p class="voice-actor"><b>Voice Actor:</b> ${char.voice_actors[0].person.name} (${char.voice_actors[0].language})</p>` : ''}
           </div>
       </div>`
-  }).join('')}</div>`
-  : '<p>No character information available.</p>';
-  }
+      }).join('')}</div>`
+      : '<p>No character information available.</p>';
+  } 1
 }
 
 async function loadStaff(animeId) {
@@ -383,24 +415,25 @@ async function loadStaff(animeId) {
     console.error('Failed to load staff:', error);
   }
 
+  console.log(staffData)
   if (window.location.hash !== currentHash) return;
 
   const staffContainer = document.getElementById('staff');
   if (staffContainer) {
     staffContainer.innerHTML = (staffData && staffData.length > 0)
-    ? `<div class="staff-grid">${staffData.map(staff => {
-       const imgSrc = staff.person.images.jpg.image_url;
-       const isPlaceholder = imgSrc.includes('questionmark');
-       return `
+      ? `<div class="staff-grid">${staffData.map(staff => {
+        const imgSrc = staff.person.images.jpg.image_url;
+        const isPlaceholder = imgSrc.includes('questionmark');
+        return `
        <div class="staff-card">
-           ${isPlaceholder ? '<div class="placeholder-icon"><i class="fas fa-user-tie"></i></div>' : `<img src="${imgSrc}" loading="lazy" alt="${staff.person.name}">`}
+           ${isPlaceholder ? '<div class="placeholder-icon"><i class="fas fa-image"></i></div>' : `<img src="${imgSrc}" loading="lazy" alt="${staff.person.name}">`}
            <div class="staff-info">
                <h5>${staff.person.name}</h5>
                <p>${staff.positions.join(', ')}</p>
            </div>
        </div>`
-   }).join('')}</div>`
-   : '<p>No staff information available.</p>'; 
+      }).join('')}</div>`
+      : '<p>No staff information available.</p>';
   }
 }
 
@@ -420,7 +453,7 @@ async function loadReviews(animeId) {
       container.innerHTML += '<p style="text-align: center; color: var(--text-color); padding: 2rem;">No reviews available.</p>';
       return;
     }
-    
+
     const reviewCardsHTML = reviewsData.map(review => createReviewCard(review)).join('');
     galleryContainer.innerHTML = reviewCardsHTML;
     container.appendChild(galleryContainer);
@@ -443,8 +476,8 @@ function createReviewCard(review) {
   const malId = review.mal_id || 'N/A';
   const reviewText = review.review || 'Prolly nothing important';
   const truncatedText = reviewText.length < 300
-  ? reviewText 
-  : reviewText.substring(0,300) + '...';
+    ? reviewText
+    : reviewText.substring(0, 300) + '...';
 
   return `
     <div class="review-card" data-full-text="${escapeHTML(reviewText)}" data-score="${score}" data-username="${username}">
@@ -494,37 +527,56 @@ function initReviewsStuff() {
   }
 
   function showReview(card) {
-    console.log('showing revview popup');
+    console.log('showing review popup');
+
     const container = document.getElementById('popup');
+
     const review = card.dataset.fullText;
     const name = card.dataset.username;
     const score = card.dataset.score;
-    container.style.zIndex = '999';
-    const contentDiv = document.createElement('div')
-    contentDiv.id = 'popup-content'
-    contentDiv.innerHTML = `
-      <button id='popup-close'>x</button>
-      <h3>${name} - ${score}<i class="fas fa-star"></i></h3>
-      <p>${review}</p>
-    `
-    container.appendChild(contentDiv);
-    container.addEventListener('click', (e) => {
-      if (e.target === container) {
-        container.style.zIndex = '-10';
-        container.innerHTML = '';
-      }
-    });
-    document.getElementById('popup-close').addEventListener('click', () => {
-        container.style.zIndex = '-10';
-        container.innerHTML = '';
-    });
-  };
 
+    container.style.zIndex = '9999';
+    container.innerHTML = '';
+
+    const contentDiv = document.createElement('div');
+    contentDiv.id = 'popup-content';
+
+    contentDiv.innerHTML = `
+      <button id="popup-close" aria-label="Close popup">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <h3>
+        ${escapeHTML(name)}
+        <span>- ${score}</span>
+        <i class="fas fa-star"></i>
+      </h3>
+
+      <p>${escapeHTML(review)}</p>
+    `;
+
+    container.appendChild(contentDiv);
+
+    const closePopup = () => {
+      container.style.zIndex = '-10';
+      container.innerHTML = '';
+    };
+
+    container.onclick = (e) => {
+      if (e.target === container) {
+        closePopup();
+      }
+    };
+
+    document
+      .getElementById('popup-close')
+      .addEventListener('click', closePopup);
+  }
   reviewCards.forEach((card) => {
-    card.addEventListener('mouseenter', () => {showIcon(card)});
-    card.addEventListener('mouseleave', () => {hideIcon(card)});
-    card.addEventListener('touchstart', () => {showIcon(card)});
-    card.addEventListener('touchend', () => {hideIcon(card)});
-    card.addEventListener('click', () => {showReview(card)})
+    card.addEventListener('mouseenter', () => { showIcon(card) });
+    card.addEventListener('mouseleave', () => { hideIcon(card) });
+    card.addEventListener('touchstart', () => { showIcon(card) });
+    card.addEventListener('touchend', () => { hideIcon(card) });
+    card.addEventListener('click', () => { showReview(card) })
   });
 };
