@@ -47,6 +47,7 @@ export async function loadSearchPage() {
                 </div>
             </div>
             <div id="search-suggestions"></div>
+            <div class="search-note">NSFW results are enabled by default. Use the filters to change this.</div>
         </div>
         <div class="filter-options" style="display: none;">
             <h2 class='filter-title'>Filter Options</h2>
@@ -283,6 +284,23 @@ export async function initSearch() {
         suggestionTimer = setTimeout(() => {
             showSearchSuggestions(query);
         }, 300);
+    });
+    searchIn.addEventListener('focus', () => {
+        const query = searchIn.value.trim();
+
+        clearTimeout(suggestionTimer);
+
+        suggestionTimer = setTimeout(() => {
+            showSearchSuggestions(query);
+        }, 100);
+    });
+    searchIn.addEventListener('blur', () => {
+        const suggestionsContainer = document.getElementById('search-suggestions');
+        setTimeout(() => {
+            if (suggestionsContainer && !searchIn.matches(':focus')) {
+                suggestionsContainer.style.display = 'none';
+            }
+        }, 200);
     });
     searchIn.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {

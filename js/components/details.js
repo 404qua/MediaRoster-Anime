@@ -78,10 +78,10 @@ export async function loadDetailsPage(animeId = null) {
         .replace('?autoplay=1', '') +
         '&modestbranding=1&showinfo=0&rel=0';
     }
-    else if (Math.floor(Math.random() * 50) > 0) {
+    else if (Math.floor(Math.random() * 20) === 0) {
       embed = window.location.origin;
     }
-    const isEgg = embed === window.location.origin;
+    const isEgg = embed === window.location;
     const trailerHTML = embed
       ? `
     <div class="details-trailer">

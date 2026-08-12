@@ -63,6 +63,13 @@
     color: var(--primary-accent);
 }
 
+.search-note {
+    margin-top: 6px;
+    font-size: 0.75rem;
+    color: var(--warning-color);
+    text-align: center;
+}
+
 .filter-button {
     background-color: var(--darker-accent);
     color: var(--text-color);
