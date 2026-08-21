@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MediaRoster: Anime</title>
+    <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
     <style>
         body::-webkit-scrollbar {
             display: none;
@@ -142,37 +143,102 @@
             color: var(--primary-accent);
         }
 
-        nav ul li a.active {
-            color: var(--primary-accent);
-        }
-
-        .nav-text-desktop {
-            display: inline;
-        }
-
-        .nav-text-mobile {
-            display: none;
-        }
-
         .nav-links-visible {
             display: flex;
+            align-items: center;
+        }
+
+        #navsignin:not(.nav-user-btn) {
+            background-color: var(--primary-accent);
+            color: #fff !important;
+            padding: 0.35rem 0.9rem;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: background-color 0.2s, transform 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        #navsignin:not(.nav-user-btn):hover {
+            background-color: var(--hover-primary-accent);
+            color: #fff !important;
+            transform: translateY(-1px);
+        }
+
+        #navsignin.nav-user-btn,
+        #navuser-menu.nav-user-menu-btn {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(217, 162, 245, 0.45);
+            border-radius: 10px;
+            color: var(--lighter-accent) !important;
+            font-weight: 600;
+            align-items: center;
+            gap: 0.6rem;
+            transition: all 0.2s ease;
+        }
+
+        #navsignin.nav-user-btn {
+            display: inline-flex;
+            margin: 0;
+            padding: 0.75rem 1rem;
+        }
+
+        #navsignin.nav-user-btn:hover,
+        #navuser-menu.nav-user-menu-btn:hover {
+            background: rgba(137, 96, 255, 0.18) !important;
+            border-color: var(--primary-accent);
+            color: #fff !important;
+        }
+
+        #navsignin-menu {
+            background-color: var(--primary-accent);
+            color: #fff !important;
+            border-radius: 6px;
+            margin: 0.5rem 1rem;
+            width: calc(100% - 2rem);
+            /* Fixes overflow caused by margin + width: 100% */
+            padding: 0.6rem 1rem;
+            font-weight: 600;
+            text-align: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+            box-sizing: border-box;
+        }
+
+        #navsignin-menu:hover {
+            background-color: var(--hover-primary-accent);
+            color: #fff !important;
         }
 
         .nav-links-menu {
-            display: none;
+            display: flex;
             flex-direction: column;
             position: absolute;
             top: 100%;
             left: 0;
-            width: 100%;
+            width: max-content;
+            min-width: 220px;
+            max-width: 85vw;
             background-color: var(--bg-color-secondary);
             text-align: left;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
             padding: 0;
+            border-radius: 0 0 10px 10px;
+            border: 1px solid var(--border-color);
+            border-top: none;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
+            pointer-events: none;
+            z-index: 10000;
         }
 
         .nav-links-menu.nav-active {
-            display: flex;
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
         }
 
         .nav-links-menu li {
@@ -188,6 +254,25 @@
             padding: 1rem 1.5rem;
             width: 100%;
             box-sizing: border-box;
+        }
+
+        #navuser-menu.nav-user-menu-btn {
+            background: rgba(255, 255, 255, 0.04) !important;
+            border: 1px solid rgba(217, 162, 245, 0.45);
+            border-radius: 10px;
+            color: var(--lighter-accent) !important;
+            gap: 0.65rem;
+            margin: 0.75rem 1rem 0.5rem;
+            padding: 0.8rem 1rem;
+            width: calc(100% - 2rem);
+            font-weight: 600;
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.22);
+        }
+
+        #navuser-menu.nav-user-menu-btn:hover {
+            background: rgba(137, 96, 255, 0.16) !important;
+            border-color: var(--primary-accent);
+            color: #fff !important;
         }
 
         footer {
@@ -314,16 +399,16 @@
 
         @media (max-width: 550px) {
             .nav-title .title a {
-                font-size: 9vw;
+                font-size: 6vw;
             }
 
             .hamburger i {
-                font-size: 11vw;
+                font-size: 8vw;
             }
 
             .hamburger {
-                width: 12vw;
-                height: 12vw;
+                width: 9vw;
+                height: 9vw;
             }
 
             nav {
@@ -381,26 +466,38 @@
                 </li>
                 <li><a href="#/search" id="navsearch"><i class="fas fa-search"></i><span class="nav-text-desktop">
                             Search</span></a></li>
-                <li><a href="https://github.com/aqua-flare" target="_blank" id="navsayhi" class="navsayhi"><i class="fas fa-hand-wave"></i><span class="nav-text-desktop"> Say
+                <li><a href="https://github.com/aqua-flare" target="_blank" id="navsayhi" class="navsayhi"><i
+                            class="fas fa-hand-wave"></i><span class="nav-text-desktop"> Say
                             Hi!</span></a></li>
+                <li><a href="#/signin" id="navsignin"><i class="fas fa-sign-in-alt"></i><span class="nav-text-desktop">
+                            Sign In</span></a></li>
             </ul>
             <ul class="nav-links-menu">
+                <li id="navuser-top-item" style="display: none;"><a href="#/profile" id="navuser-menu" class="nav-user-menu-btn"><i class="fas fa-user-circle"></i> <span id="navuser-menu-name">Profile</span></a></li>
                 <li><a href="#/" id="navhome-menu"><i class="fas fa-home"></i><span class="nav-text-desktop">
                             Home</span></a></li>
                 <li><a href="#/search" id="navsearch-menu"><i class="fas fa-search"></i><span class="nav-text-desktop">
                             Search</span></a></li>
-                <li><a href="https://github.com/aqua-flare" target="_blank" id="navsayhi-menu"><i class="fas fa-hand-wave"></i><span
-                            class="nav-text-desktop"> Say Hi!</span></a></li>
-                <li><a href="#/404" target="_blank" id="navmovies"><i class="fas fa-film"></i><span class="nav-text-desktop"> Movies and
+                <li><a href="https://github.com/aqua-flare" target="_blank" id="navsayhi-menu"><i
+                            class="fas fa-hand-wave"></i><span class="nav-text-desktop"> Say Hi!</span></a></li>
+                <li><a href="#/404" target="_blank" id="navmovies"><i class="fas fa-film"></i><span
+                            class="nav-text-desktop"> Movies and
                             Shows</span></a></li>
-                <li><a href="#/404" target="_blank" id="navbooks"><i class="fas fa-book"></i><span class="nav-text-desktop">
+                <li><a href="#/404" target="_blank" id="navbooks"><i class="fas fa-book"></i><span
+                            class="nav-text-desktop">
                             Books</span></a></li>
-                <li><a href="#/404" target="_blank" id="navmanga"><i class="fas fa-book-open"></i><span class="nav-text-desktop">
+                <li><a href="#/404" target="_blank" id="navmanga"><i class="fas fa-book-open"></i><span
+                            class="nav-text-desktop">
                             Manga</span></a></li>
-                <li><a href="#/404" target="_blank" target="_blank" id="navgames"><i class="fas fa-gamepad"></i><span class="nav-text-desktop">
+                <li><a href="#/404" target="_blank" target="_blank" id="navgames"><i class="fas fa-gamepad"></i><span
+                            class="nav-text-desktop">
                             Games</span></a></li>
                 <li><a href="#/" id="navanime" class="active"><i class="fas fa-tv"></i><span class="nav-text-desktop">
                             Anime</span></a></li>
+                <li><a href="#/signin" id="navsignin-menu"><i class="fas fa-sign-in-alt"></i><span
+                            class="nav-text-desktop"> Sign In</span></a></li>
+                <li><a href="#/register" id="navregister-menu"><i class="fas fa-user-plus"></i><span
+                            class="nav-text-desktop"> Register</span></a></li>
             </ul>
         </nav>
     </header>
@@ -454,6 +551,7 @@
         const navhome = document.getElementById('navhome');
         const navsearch = document.getElementById('navsearch');
         const navsayhi = document.getElementById('navsayhi');
+        const navsignin = document.getElementById('navsignin');
         const navhomeMenu = document.getElementById('navhome-menu');
         const navsearchMenu = document.getElementById('navsearch-menu');
         const navsayhiMenu = document.getElementById('navsayhi-menu');
@@ -462,6 +560,8 @@
         const navmanga = document.getElementById('navmanga');
         const navgames = document.getElementById('navgames');
         const navanime = document.getElementById('navanime');
+        const navsigninMenu = document.getElementById('navsignin-menu');
+        const navregisterMenu = document.getElementById('navregister-menu');
 
         hamburger.addEventListener("click", () => {
             navLinksMenu.classList.toggle("nav-active");
@@ -473,18 +573,22 @@
             }
         };
 
-        navhome.addEventListener('click', closeMenu);
-        navsearch.addEventListener('click', closeMenu);
-        navsayhi.addEventListener('click', closeMenu);
-        navhomeMenu.addEventListener('click', closeMenu);
-        navsearchMenu.addEventListener('click', closeMenu);
-        navsayhiMenu.addEventListener('click', closeMenu);
-        navmovies.addEventListener('click', closeMenu);
-        navbooks.addEventListener('click', closeMenu);
-        navmanga.addEventListener('click', closeMenu);
-        navgames.addEventListener('click', closeMenu);
-        navanime.addEventListener('click', closeMenu);
+        if (navhome) navhome.addEventListener('click', closeMenu);
+        if (navsearch) navsearch.addEventListener('click', closeMenu);
+        if (navsayhi) navsayhi.addEventListener('click', closeMenu);
+        if (navsignin) navsignin.addEventListener('click', closeMenu);
+        if (navhomeMenu) navhomeMenu.addEventListener('click', closeMenu);
+        if (navsearchMenu) navsearchMenu.addEventListener('click', closeMenu);
+        if (navsayhiMenu) navsayhiMenu.addEventListener('click', closeMenu);
+        if (navmovies) navmovies.addEventListener('click', closeMenu);
+        if (navbooks) navbooks.addEventListener('click', closeMenu);
+        if (navmanga) navmanga.addEventListener('click', closeMenu);
+        if (navgames) navgames.addEventListener('click', closeMenu);
+        if (navanime) navanime.addEventListener('click', closeMenu);
+        if (navsigninMenu) navsigninMenu.addEventListener('click', closeMenu);
+        if (navregisterMenu) navregisterMenu.addEventListener('click', closeMenu);
     </script>
+    <script type="module" src="./js/supabase.js"></script>
     <script type="module" src="./js/api.js"></script>
     <script type="module" src="./js/router.js"></script>
     <script type="module" src="./js/pages.js"></script>

@@ -95,30 +95,12 @@ dist
 
 public
 static
-
-# Remix build output
-.cache/
-public/build/
-
-# Production builds
-/dist
-/public
+__pycache__/
 
 # Misc
 .DS_Store
 .AppleDouble
 .LSOverride
-
-# Thumbnails
-._*
-
-# Files that might appear on external disk
-.Spotlight-V100
-.Trashes
-
-# Sublime Text
-*.sublime-project
-*.sublime-workspace
 
 # Visual Studio Code
 .vscode/
@@ -127,17 +109,6 @@ public/build/
 !.vscode/launch.json
 !.vscode/extensions.json
 *.code-workspace
-
-# Vim
-.swp
-.swo
-
-# JetBrains
-.idea/
-
-# Operating System Files
-.DS_Store
-Thumbs.db
 
 # Misc
 .firebase/

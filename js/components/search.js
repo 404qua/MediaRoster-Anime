@@ -194,7 +194,9 @@ function loadPagination(paginationData, containerEl) {
     if (!containerEl) return;
     containerEl.innerHTML = '';
 
-    const { current_page, last_visible_page, has_next_page } = paginationData;
+    let { current_page, last_visible_page, has_next_page } = paginationData;
+    if (current_page > 1000) current_page = 1000;
+    if (last_visible_page > 1000) last_visible_page = 1000;
 
     const createButton = (text, page, enabled) => {
         const btn = document.createElement('button');
@@ -203,7 +205,7 @@ function loadPagination(paginationData, containerEl) {
         if (enabled) {
             btn.addEventListener('click', () => {
                 const params = getSafeParams();
-                console.log(`Current params before setting page: ${params.toString()}`);
+                if (page > 1000) page = 1000;
                 params.set('page', page);
                 const hash = `#/search?${params.toString() || `page=${page}`}`
                 window.location.hash = hash;
@@ -251,6 +253,7 @@ export async function displaySearchResults(searchResults) {
 
     initFlashcardHover();
     loadPagination(searchResults.pagination, pagination);
+    hideLoader();
 }
 
 export async function initSearch() {
@@ -298,7 +301,7 @@ export async function initSearch() {
         const suggestionsContainer = document.getElementById('search-suggestions');
         setTimeout(() => {
             if (suggestionsContainer && !searchIn.matches(':focus')) {
-                suggestionsContainer.style.display = 'none';
+                suggestionsContainer.classList.remove('active');
             }
         }, 200);
     });
@@ -318,27 +321,27 @@ async function showSearchSuggestions(query) {
     const suggestionsContainer = document.getElementById('search-suggestions');
     if (!suggestionsContainer) return;
     if (!query) {
-        suggestionsContainer.style.display = 'none'
-        return
+        suggestionsContainer.classList.remove('active');
+        return;
     };
     const searchURL = await constructURL(false);
     if (!searchURL) {
-        suggestionsContainer.style.display = 'none'
+        suggestionsContainer.classList.remove('active');
         return;
     }
 
     try {
         const results = await searchAnime(searchURL);
         if (suggestionReq !== id) {
-            return
+            return;
         }
         if (!results?.data?.length) {
             suggestionsContainer.innerHTML = `
             <div class='no-suggestion'>
                 No matching results
             </div>
-            `
-            suggestionsContainer.style.display = 'block';
+            `;
+            suggestionsContainer.classList.add('active');
             return;
         }
 
@@ -384,7 +387,7 @@ async function showSearchSuggestions(query) {
             </div>
         </a>
         `).join('')}`;
-        suggestionsContainer.style.display = 'block';
+        suggestionsContainer.classList.add('active');
     } catch (error) {
         console.error('Error fetching search suggestions:', error);
     }
@@ -400,8 +403,15 @@ async function handleSearch(updateURL = true) {
                             <div class="dot"></div>
                          </div>`;
     if (url) {
-        const results = await searchAnime(url);
-        displaySearchResults(results);
+        try {
+            const results = await searchAnime(url);
+            displaySearchResults(results);
+        } catch (error) {
+            console.error('Error handling search:', error);
+            hideLoader();
+        }
+    } else {
+        hideLoader();
     }
 }
 

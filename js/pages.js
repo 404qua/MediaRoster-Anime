@@ -2,13 +2,30 @@ import { initSlideshow, initFlashcardHover, randomAnime,  initGalleryControls } 
 import { searchAnime, getTopRatedAnime, getMostPopularAnime, getAiringAnime, getSeasonalAnime, getGenres, genres, getAnimeInfo } from './api.js';
 import { createSection, escapeHTML } from './components/UIs.js';
 import { loadSearchPage } from './components/search.js';
+import { loadSignInPage, loadRegisterPage, loadVerifyEmailPage, loadProfileSetupPage } from './components/auth.js';
+import { loadProfilePage } from './components/profile.js';
 import { reccomendedData} from './components/data.js'
 
 // ====== PAGE ROUTING ======
 export function loadPageContent(pageName) {
   document.getElementById('randomDiv').style.display = 'none';
+  const navhome = document.getElementById('navhome');
+  const navsearch = document.getElementById('navsearch');
+  const navsignin = document.getElementById('navsignin');
+  if (navhome) navhome.style.color = '#ddd';
+  if (navsearch) navsearch.style.color = '#ddd';
+  if (navsignin && !navsignin.classList.contains('nav-user-btn')) navsignin.style.color = '#ddd';
+
   if (pageName === 'home') loadHomePage();
   else if (pageName === 'search') loadSearchPage();
+  else if (pageName === 'signin') {
+    if (navsignin && !navsignin.classList.contains('nav-user-btn')) navsignin.style.color = '#8960ff';
+    loadSignInPage();
+  }
+  else if (pageName === 'register') loadRegisterPage();
+  else if (pageName === 'verify-email') loadVerifyEmailPage();
+  else if (pageName === 'profile-setup') loadProfileSetupPage();
+  else if (pageName === 'profile') loadProfilePage();
   else load404();
 }
 

@@ -11,7 +11,8 @@ filesToHash = {
         os.path.join(srcDir, "css", "style.css"),
         os.path.join(srcDir, "css", "icons.css"),
         os.path.join(srcDir, "css", "search.css"),
-        os.path.join(srcDir, "css", "details.css")
+        os.path.join(srcDir, "css", "details.css"),
+        os.path.join(srcDir, "css", "auth.css")
     ],
     "js": [
         os.path.join(srcDir, "js", "pages.js"),
@@ -21,7 +22,10 @@ filesToHash = {
         os.path.join(srcDir, "js", "components", "UIs.js"),
         os.path.join(srcDir, "js", "components", "search.js"),
         os.path.join(srcDir, "js", "components", "details.js"),
-        os.path.join(srcDir, "js", "components", "data.js")
+        os.path.join(srcDir, "js", "components", "data.js"),
+        os.path.join(srcDir, "js", "components", "auth.js"),
+        os.path.join(srcDir, "js", "components", "profile.js"),
+        os.path.join(srcDir, "js", "supabase.js")
     ],
     "others": [
         os.path.join(srcDir, "media", "jumpscare.mp3"),
@@ -297,8 +301,14 @@ def hashAndUpdateRefs():
         ) as f:
             text = f.read()
 
+        hcaptchaApiUrl = "https://js.hcaptcha.com/1/api.js"
+        hcaptchaApiPlaceholder = "__HCAPTCHA_URL__"
+        text = text.replace(hcaptchaApiUrl, hcaptchaApiPlaceholder)
+
         for old, new in hashedMap.items():
             text = text.replace(old, new)
+
+        text = text.replace(hcaptchaApiPlaceholder, hcaptchaApiUrl)
 
         with open(
             filePath,

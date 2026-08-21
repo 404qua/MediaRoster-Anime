@@ -1,16 +1,26 @@
 import { loadPageContent, load404, hideLoader } from './pages.js';
 import { loadDetailsPage } from './components/details.js';
+import { initAuthUI } from './components/auth.js';
 
 const routes = {
   '/': 'home',
-  '/search': 'search'
+  '/search': 'search',
+  '/signin': 'signin',
+  '/signIn': 'signin',
+  '/register': 'register',
+  '/verify-email': 'verify-email',
+  '/email-verify': 'verify-email',
+  '/profile-setup': 'profile-setup',
+  '/profileSetup': 'profile-setup',
+  '/profile': 'profile'
 };
 
 export const handleRoute = () => {
   setTimeout(() => {
-    window.scrollTo(0,0);
+    window.scrollTo(0, 0);
   }, 10);
   hideLoader();
+  initAuthUI();
   const path = window.location.hash.substring(1) || '/';
   const [pathName] = path.split('?');
   const routeName = routes[pathName];

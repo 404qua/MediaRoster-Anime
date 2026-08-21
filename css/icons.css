@@ -389,6 +389,18 @@
   content: "\f518";
 }
 
+.fa-book:before {
+  content: "\f02d";
+}
+
+.fa-pen:before {
+  content: "\f304";
+}
+
+.fa-gamepad:before {
+  content: "\f11b";
+}
+
 .fa-play-circle:before {
   content: "\f144";
 }
@@ -567,4 +579,65 @@
     u+f08e, u+f090, u+f09a, u+f0ac, u+f0ae, u+f0b2, u+f0d0, u+f0d6, u+f0e4,
     u+f0ec, u+f10a-f10b, u+f123, u+f13e, u+f148-f149, u+f14c, u+f156, u+f15e,
     u+f160-f161, u+f163, u+f175-f178, u+f195, u+f1f8, u+f219, u+f27a;
+}
+
+.fa-eye:before {
+  content: "\f06e";
+}
+
+.fa-eye-slash:before {
+  content: "\f070";
+}
+
+.fa-lock:before {
+  content: "\f023";
+}
+
+.fa-envelope:before {
+  content: "\f0e0";
+}
+
+.fa-user-plus:before {
+  content: "\f234";
+}
+
+.fa-sign-in-alt:before,
+.fa-right-to-bracket:before {
+  content: "\f2f6";
+}
+
+.fa-camera:before {
+  content: "\f030";
+}
+
+.fa-film:before {
+  content: "\f008";
+}
+
+.fa-play:before {
+  content: "\f04b";
+}
+
+.fa-user-circle:before,
+.fa-circle-user:before {
+  content: "\f2bd";
+}
+
+.fa-user-edit:before,
+.fa-user-pen:before {
+  content: "\f4ff";
+}
+
+.fa-envelope-open-text:before {
+  content: "\f658";
+}
+
+.fa-info-circle:before,
+.fa-circle-info:before {
+  content: "\f05a";
+}
+
+.fa-sign-out-alt:before,
+.fa-right-from-bracket:before {
+  content: "\f2f5";
 }
