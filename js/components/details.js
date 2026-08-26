@@ -2,6 +2,7 @@ import { getAnimeDetails, getAnimeCharacters, getAnimeStaff, getAnimeInfo, getRa
 import { initFlashcardHover, initGalleryControls } from './initializer.js';
 import { showLoader, hideLoader, loadCSS, load404, updateMetaTags } from '../pages.js';
 import { createFlashcard, escapeHTML } from './UIs.js';
+import { supabase } from '../supabase.js';
 
 export async function loadDetailsPage(animeId = null) {
   console.log(`Loading Details for anime ID: ${animeId}`);
@@ -199,11 +200,19 @@ export async function loadDetailsPage(animeId = null) {
     `;
     const detailsHTML = `
       <div class="details-hero-wrapper">
-        <h1>${anime.title_english || anime.title}</h1>
+        <div class="details-hero-top-bar">
+          <div class="details-watchlist-wrapper">
+            <button id="details-watchlist-btn" class="details-watchlist-btn" data-id="${anime.mal_id}" aria-label="Add to Watchlist">
+              <i class="fa-regular fa-plus"></i>
+              <span>Add to Watchlist</span>
+            </button>
+          </div>
+          <h1 class="details-title">${anime.title_english || anime.title}</h1>
+        </div>
         <div class="details-hero">
           <div class="details-poster-group">
             <div class="details-poster">
-              <img src="${anime.images?.webp?.large_image_url || anime.imagea?.jpg?.large_image_url}" alt="${anime.title || 'No Title'}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"/>
+              <img src="${anime.images?.webp?.large_image_url || anime.images?.jpg?.large_image_url || anime.imagea?.jpg?.large_image_url}" alt="${anime.title || 'No Title'}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"/>
               <div class="placeholder-icon" style="display: none;"><i class="fas fa-question-circle"></i></div>
             </div>
           </div>
@@ -273,6 +282,7 @@ export async function loadDetailsPage(animeId = null) {
     if (window.location.hash === currentHash) {
       content.innerHTML = detailsHTML;
       initDetailsNav();
+      initWatchlistButton(animeId);
       loadReviews(animeId);
       loadCharecters(animeId);
       loadStaff(animeId);
@@ -392,13 +402,15 @@ async function loadCharecters(animeId) {
       ? `<div class="character-grid">${charactersData.map(char => {
         const imgSrc = char.character.images.webp.image_url;
         const isPlaceholder = imgSrc.includes('questionmark');
+        const imgHtml = isPlaceholder ? '<div class="placeholder-icon"><i class="fas fa-user"></i></div>' : '<img src="' + imgSrc + '" loading="lazy" alt="' + char.character.name + '">';
+        const voiceHtml = char.voice_actors && char.voice_actors.length > 0 ? '<p class="voice-actor"><b>Voice Actor:</b> ' + char.voice_actors[0].person.name + ' (' + char.voice_actors[0].language + ')</p>' : '';
         return `
       <div class="character-card">
-          ${isPlaceholder ? '<div class="placeholder-icon"><i class="fas fa-user"></i></div>' : `<img src="${imgSrc}" loading="lazy" alt="${char.character.name}">`}
+          ${imgHtml}
           <div class="character-info">
               <h5>${char.character.name}</h5>
               <p>${char.role}</p>
-              ${char.voice_actors && char.voice_actors.length > 0 ? `<p class="voice-actor"><b>Voice Actor:</b> ${char.voice_actors[0].person.name} (${char.voice_actors[0].language})</p>` : ''}
+              ${voiceHtml}
           </div>
       </div>`
       }).join('')}</div>`
@@ -424,9 +436,10 @@ async function loadStaff(animeId) {
       ? `<div class="staff-grid">${staffData.map(staff => {
         const imgSrc = staff.person.images.jpg.image_url;
         const isPlaceholder = imgSrc.includes('questionmark');
+        const imgHtml = isPlaceholder ? '<div class="placeholder-icon"><i class="fas fa-image"></i></div>' : '<img src="' + imgSrc + '" loading="lazy" alt="' + staff.person.name + '">';
         return `
        <div class="staff-card">
-           ${isPlaceholder ? '<div class="placeholder-icon"><i class="fas fa-image"></i></div>' : `<img src="${imgSrc}" loading="lazy" alt="${staff.person.name}">`}
+           ${imgHtml}
            <div class="staff-info">
                <h5>${staff.person.name}</h5>
                <p>${staff.positions.join(', ')}</p>
@@ -542,17 +555,19 @@ function initReviewsStuff() {
     contentDiv.id = 'popup-content';
 
     contentDiv.innerHTML = `
-      <button id="popup-close" aria-label="Close popup">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
+      <div class="popup-top-bar">
+        <h3 class="popup-reviewer-title">
+          <span class="popup-reviewer-name">${escapeHTML(name)}</span>
+          <span class="popup-reviewer-score"><i class="fas fa-star"></i> ${escapeHTML(score)}</span>
+        </h3>
+        <button id="popup-close" class="popup-close-btn" aria-label="Close popup">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
 
-      <h3>
-        ${escapeHTML(name)}
-        <span>- ${score}</span>
-        <i class="fas fa-star"></i>
-      </h3>
-
-      <p>${escapeHTML(review)}</p>
+      <div class="popup-body">
+        <p>${escapeHTML(review)}</p>
+      </div>
     `;
 
     container.appendChild(contentDiv);
@@ -568,10 +583,12 @@ function initReviewsStuff() {
       }
     };
 
-    document
-      .getElementById('popup-close')
-      .addEventListener('click', closePopup);
+    const closeBtn = document.getElementById('popup-close');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', closePopup);
+    }
   }
+
   reviewCards.forEach((card) => {
     card.addEventListener('mouseenter', () => { showIcon(card) });
     card.addEventListener('mouseleave', () => { hideIcon(card) });
@@ -580,3 +597,88 @@ function initReviewsStuff() {
     card.addEventListener('click', () => { showReview(card) })
   });
 };
+
+async function initWatchlistButton(animeId) {
+  const btn = document.getElementById('details-watchlist-btn');
+  if (!btn) return;
+
+  const { data: { session } } = await supabase.auth.getSession();
+  const user = session?.user;
+
+  if (!user) {
+    btn.addEventListener('click', () => {
+      window.location.hash = '#/signin';
+    });
+    return;
+  }
+
+  let currentEntry = null;
+  try {
+    const { data: entry } = await supabase
+      .from('watchlist')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('type', 'anime')
+      .eq('id', animeId)
+      .maybeSingle();
+
+    currentEntry = entry;
+    updateWatchlistButtonUI(btn, currentEntry);
+  } catch (err) {
+    console.warn('Error checking watchlist status:', err);
+  }
+
+  btn.addEventListener('click', async () => {
+    btn.disabled = true;
+    try {
+      if (currentEntry) {
+        // Remove from watchlist
+        const { error } = await supabase
+          .from('watchlist')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('type', 'anime')
+          .eq('id', animeId);
+
+        if (error) throw error;
+        currentEntry = null;
+      } else {
+        // Add to watchlist
+        const { error } = await supabase
+          .from('watchlist')
+          .insert({
+            user_id: user.id,
+            type: 'anime',
+            id: animeId,
+            status: 'plan_to_watch'
+          });
+
+        if (error) throw error;
+        currentEntry = { status: 'plan_to_watch' };
+      }
+      updateWatchlistButtonUI(btn, currentEntry);
+    } catch (err) {
+      console.error('Failed to update watchlist:', err);
+      alert('Could not update watchlist. Please try again.');
+    } finally {
+      btn.disabled = false;
+    }
+  });
+}
+
+function updateWatchlistButtonUI(btn, entry) {
+  if (entry) {
+    btn.className = 'details-watchlist-btn in-watchlist';
+    btn.innerHTML = `
+      <i class="fas fa-bookmark"></i>
+      <span>In Watchlist</span>
+    `;
+    btn.title = `In your watchlist (${entry.status}). Click to remove.`;
+  } else {
+    btn.className = 'details-watchlist-btn';
+    btn.innerHTML = `
+      <i class="fa-regular fa-bookmark"></i>
+      <span>Add to Watchlist</span>
+    `;
+  }
+}

@@ -12,7 +12,8 @@ filesToHash = {
         os.path.join(srcDir, "css", "icons.css"),
         os.path.join(srcDir, "css", "search.css"),
         os.path.join(srcDir, "css", "details.css"),
-        os.path.join(srcDir, "css", "auth.css")
+        os.path.join(srcDir, "css", "auth.css"),
+        os.path.join(srcDir, "css", "profile.css")
     ],
     "js": [
         os.path.join(srcDir, "js", "pages.js"),

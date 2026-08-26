@@ -18,16 +18,78 @@
   overflow: hidden;
 }
 
-.details-hero-wrapper h1 {
+.details-hero-top-bar {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 2.5rem 0.75rem;
+  display: grid;
+  place-items: center;
+  z-index: 2;
+  box-sizing: border-box;
+}
+
+.details-hero-top-bar h1 {
+  width: 100%;
+  box-sizing: border-box;
   text-align: center;
   margin: 0;
-  padding: 2rem 1rem 1.5rem;
-  font-size: 3rem;
+  padding: 0 8rem;
+  font-size: 2.8rem;
   color: var(--primary-accent);
   font-weight: 700;
   text-shadow: 0 0 8px rgba(255, 87, 34, 0.2);
-  position: relative;
-  z-index: 1;
+  word-break: break-word;
+}
+
+.details-watchlist-wrapper {
+  position: absolute;
+  top: 2rem;
+  right: 2.5rem;
+}
+
+.details-watchlist-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(137, 96, 255, 0.14);
+  border: 1px solid var(--primary-accent);
+  color: var(--lighter-accent);
+  padding: 0.65rem 1.25rem;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.details-watchlist-btn:hover {
+  background: var(--primary-accent);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(137, 96, 255, 0.4);
+}
+
+.details-watchlist-btn.in-watchlist {
+  background: rgba(46, 204, 113, 0.16);
+  border-color: #2ecc71;
+  color: #2ecc71;
+}
+
+.details-watchlist-btn.in-watchlist:hover {
+  background: #2ecc71;
+  color: #fff;
+  border-color: #2ecc71;
+}
+
+.details-watchlist-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+  transform: none;
 }
 
 .details-hero {
@@ -977,6 +1039,26 @@
 @media (max-width: 600px) {
   .details-container {
     padding: 0 1rem;
+  }
+
+  .details-hero-top-bar {
+    padding: 1.5rem 1rem 0.5rem;
+  }
+
+  .details-hero-top-bar h1 {
+    text-align: center;
+    font-size: 1.85rem;
+    padding: 0 6rem;
+  }
+
+  .details-watchlist-wrapper {
+    top: 1.5rem;
+    right: 1rem;
+  }
+
+  .details-watchlist-btn {
+    padding: 0.55rem 0.8rem;
+    font-size: 0.85rem;
   }
 
   .details-hero {

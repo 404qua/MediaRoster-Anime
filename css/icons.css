@@ -397,6 +397,10 @@
   content: "\f304";
 }
 
+.fa-google:before {
+  content: "\f1a0";
+}
+
 .fa-gamepad:before {
   content: "\f11b";
 }
@@ -640,4 +644,39 @@
 .fa-sign-out-alt:before,
 .fa-right-from-bracket:before {
   content: "\f2f5";
+}
+
+.fa-bookmark:before {
+  content: "\f02e";
+}
+
+.fa-add:before,
+.fa-plus:before {
+  content: "\2b";
+}
+
+.fa-share-nodes:before,
+.fa-share-alt:before,
+.fa-share:before {
+  content: "\f1e0";
+}
+
+.fa-user-slash:before {
+  content: "\f500";
+}
+
+.fa-copy:before {
+  content: "\f0c5";
+}
+
+.fa-check:before {
+  content: "\f00c";
+}
+
+.fa-home:before {
+  content: "\f015";
+}
+
+.fa-link:before {
+  content: "\f0c1";
 }

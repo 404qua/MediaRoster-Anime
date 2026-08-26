@@ -62,29 +62,48 @@ const fetchWithCache = async (url, cacheKey) => {
                     // yes this is actually necessary
                     if (e.name === 'QuotaExceededError') {
                         console.warn('LocalStorage quota exceeded. Clearing oldest cache entries.');
-                        const cacheItems = Object.keys(localStorage).map(key => {
-                            try {
-                                const item = JSON.parse(localStorage.getItem(key));
-                                if (item && item.timestamp) {
-                                    return { key, timestamp: item.timestamp };
-                                }
-                            } catch (error) {
-                                // ignore for incorrect cache format
-                            }
-                            return null;
-                        }).filter(item => item !== null);
+                        let cacheSuccessful = false;
+                        const maxCleanupCycles = 3;
 
-                        cacheItems.sort((a, b) => a.timestamp - b.timestamp);
-                        const itemsToRemove = Math.min(5, cacheItems.length);
-                        for (let i = 0; i < itemsToRemove; i++) {
-                            console.log(`Removing old cache: ${cacheItems[i].key}`);
-                            localStorage.removeItem(cacheItems[i].key);
+                        for (let cycle = 0; cycle < maxCleanupCycles; cycle++) {
+                            const cacheItems = Object.keys(localStorage).map(key => {
+                                try {
+                                    const item = JSON.parse(localStorage.getItem(key));
+                                    if (item && item.timestamp) {
+                                        return { key, timestamp: item.timestamp };
+                                    }
+                                } catch (error) {
+                                    // ignore for incorrect cache format
+                                }
+                                return null;
+                            }).filter(item => item !== null);
+
+                            cacheItems.sort((a, b) => a.timestamp - b.timestamp);
+                            const itemsToRemove = Math.min(5, cacheItems.length);
+                            
+                            if (itemsToRemove === 0) {
+                                console.warn('No cache items to remove.');
+                                break;
+                            }
+
+                            for (let i = 0; i < itemsToRemove; i++) {
+                                console.log(`Removing old cache: ${cacheItems[i].key}`);
+                                localStorage.removeItem(cacheItems[i].key);
+                            }
+
+                            try {
+                                localStorage.setItem(cacheKey, JSON.stringify({ data, timestamp: now }));
+                                cacheSuccessful = true;
+                                console.log('Cache stored successfully after cleanup.');
+                                break;
+                            } catch (e2) {
+                                console.warn(`Cache attempt ${cycle + 1} failed. Retrying cleanup...`);
+                            }
                         }
 
-                        try {
-                            localStorage.setItem(cacheKey, JSON.stringify({ data, timestamp: now }));
-                        } catch (e2) {
-                            console.error('Failed to cache data even after clearing some entries:', e2);
+                        if (!cacheSuccessful) {
+                            alert('Storage is full. Some features may not work properly. Please clear your browser cache.');
+                            console.error('Failed to cache data after 3 cleanup cycles. Not caching.');
                         }
                     } else {
                         console.error('Error saving to localStorage:', e);

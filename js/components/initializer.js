@@ -102,7 +102,7 @@ export function initFlashcardHover() { // following is a functinal chaos. If you
   
       popup.addEventListener('mouseleave', (e) => {
         onPopup = false;
-        // prevent flickeringand wrong hides
+        // prevent flickering and wrong hides
         if (e.relatedTarget && e.relatedTarget.closest('.flashcard-link')) return;
         if (activeCard && activeCard.contains(e.relatedTarget)) return;
         popupHide = setTimeout(tryHide, 50);
