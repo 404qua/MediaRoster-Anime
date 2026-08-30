@@ -1,9 +1,18 @@
 .search-container {
-    padding: 1rem;
+    width: min(100%, var(--content-max-width));
+    margin: 0 auto;
+    padding: 2rem 0;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
+}
+
+#search-results {
+    width: min(100%, var(--content-max-width));
+    margin: 0 auto;
+    padding: 0 1.5rem 2rem;
+    box-sizing: border-box;
 }
 
 .search-title {
@@ -404,6 +413,13 @@ input:checked+.slider:before {
     transform: translateY(-6px);
     transition: opacity 0.1s ease, transform 0.1s ease, visibility 0.1s ease;
     pointer-events: none;
+}
+
+@media (max-width: 31.25rem) {
+    #search-suggestions {
+        top: 3rem;
+        max-height: min(22rem, 42vh);
+    }
 }
 
 #search-suggestions.active {

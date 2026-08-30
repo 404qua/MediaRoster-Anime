@@ -364,7 +364,37 @@ function setupOAuthButtons() {
                 messageEl.textContent = `${action} ${provider[0].toUpperCase()}${provider.slice(1)}...`;
             }
 
-            const popup = window.open('', 'mediaroster-oauth', 'popup,width=500,height=700,resizable=yes,scrollbars=yes');
+            const isMobile = window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+
+            if (isMobile) {
+                try {
+                    const { data, error } = await supabase.auth.signInWithOAuth({
+                        provider,
+                        options: {
+                            redirectTo: `${window.location.origin}${window.location.pathname}`,
+                            skipBrowserRedirect: true
+                        }
+                    });
+                    if (error) throw error;
+                    if (!data?.url) throw new Error('Unable to open the selected sign-in provider.');
+                    window.location.assign(data.url);
+                } catch (error) {
+                    if (messageEl) {
+                        messageEl.className = 'auth-message error';
+                        messageEl.textContent = error.message || 'Unable to connect to the selected provider. Please try again.';
+                    }
+                    document.querySelectorAll('.oauth-btn').forEach(option => option.disabled = false);
+                }
+                return;
+            }
+
+            let popup = null;
+            try {
+                popup = window.open('', 'mediaroster-oauth', 'popup,width=500,height=700,resizable=yes,scrollbars=yes');
+            } catch (e) {
+                popup = null;
+            }
+
             if (!popup) {
                 try {
                     const { error } = await supabase.auth.signInWithOAuth({

@@ -39,6 +39,7 @@
             --warning-color: #ddab5b;
             --bg-color-mid: #1f1f1f;
             --bg-color-trans: #212121;
+            --content-max-width: 161.25rem;
         }
 
         body {
@@ -53,63 +54,84 @@
         }
 
         header {
-            background-color: rgba(36, 36, 36, 0.71);
-            padding: 0.5vh 0.1rem;
+            background-color: rgba(26, 26, 36, 0.85);
+            padding: 0.5rem 0.75rem;
             border-bottom: 1px solid var(--border-color);
             position: fixed;
             top: 0;
             z-index: 10000;
-            width: 100%;
-            backdrop-filter: blur(25px) brightness(200%);
-            -webkit-backdrop-filter: blur(25px) brightness(200%);
-            min-height: 7vh;
-            max-height: 9vh;
+            width: min(100%, var(--content-max-width));
+            margin: 0 auto;
+            height: 3.75rem;
+            backdrop-filter: blur(20px) brightness(130%);
+            -webkit-backdrop-filter: blur(20px) brightness(130%);
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            left: 0;
+            right: 0;
         }
 
         nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            width: 100%;
+            margin: 0 auto;
         }
 
         .nav-left {
             display: flex;
             align-items: center;
+            gap: 0.35rem;
         }
 
         .hamburger {
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 6.5vh;
-            width: 6.5vh;
+            height: 2.25rem;
+            width: 2.25rem;
             cursor: pointer;
-            margin-right: 0.5rem;
+            border-radius: 8px;
+            color: var(--text-color);
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .hamburger:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+            color: var(--primary-accent);
         }
 
         .hamburger i {
-            font-size: 5vh;
+            font-size: 1.25rem;
         }
 
         .nav-title {
             display: flex;
             align-items: center;
+            gap: 0.6rem;
         }
 
         .nav-title .logo {
-            width: 6.5vh;
-            height: 6.5vh;
-            margin-right: 0.5rem;
+            width: 2rem;
+            height: 2rem;
+            object-fit: contain;
+            border-radius: 50%;
+            display: block;
         }
 
         .nav-title .title a {
-            font-size: 6vh;
-            font-weight: bold;
+            font-size: 1.45rem;
+            font-weight: 700;
             color: var(--primary-accent);
             text-decoration: none;
+            letter-spacing: -0.5px;
+            transition: color 0.2s;
         }
 
         .nav-title .title a:hover {
+            color: var(--lighter-accent);
             cursor: pointer;
         }
 
@@ -118,25 +140,26 @@
             margin: 0;
             padding: 0;
             display: flex;
-            margin-right: 2rem;
+            align-items: center;
         }
 
         nav ul li {
-            margin-left: 1.5rem;
+            margin-left: 1.25rem;
         }
 
         .navsayhi:focus,
         nav ul li a {
             color: var(--text-color);
             text-decoration: none;
-            font-size: 3vh;
+            font-size: 0.95rem;
+            font-weight: 500;
             transition: color 0.3s;
             display: flex;
             align-items: center;
         }
 
         nav ul li a i {
-            margin-right: 0.5rem;
+            margin-right: 0.4rem;
         }
 
         nav ul li a:hover {
@@ -194,13 +217,13 @@
             background-color: var(--primary-accent);
             color: #fff !important;
             border-radius: 6px;
-            margin: 0.5rem 1rem;
-            width: calc(100% - 2rem);
-            /* Fixes overflow caused by margin + width: 100% */
-            padding: 0.6rem 1rem;
+            margin: 0.5rem 0.45rem;
+            width: auto;
+            min-width: 10.5rem;
+            padding: 0.6rem 0.9rem;
             font-weight: 600;
-            text-align: center;
-            justify-content: center;
+            text-align: left;
+            justify-content: flex-start;
             transition: background-color 0.2s;
             box-sizing: border-box;
         }
@@ -213,12 +236,13 @@
         .nav-links-menu {
             display: flex;
             flex-direction: column;
+            align-items: stretch;
             position: absolute;
             top: 100%;
-            left: 0;
+            left: 0.15rem;
             width: max-content;
-            min-width: 220px;
-            max-width: 85vw;
+            min-width: 11rem;
+            max-width: min(16rem, calc(100vw - 0.75rem));
             background-color: var(--bg-color-secondary);
             text-align: left;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
@@ -243,6 +267,7 @@
 
         .nav-links-menu li {
             margin: 0;
+            width: 100%;
             border-bottom: 1px solid var(--border-color);
         }
 
@@ -251,9 +276,13 @@
         }
 
         .nav-links-menu li a {
-            padding: 1rem 1.5rem;
-            width: 100%;
+            padding: 0.7rem 0.9rem;
+            width: auto;
+            min-width: 10.5rem;
             box-sizing: border-box;
+            justify-content: flex-start;
+            text-align: left;
+            white-space: nowrap;
         }
 
         #navuser-menu.nav-user-menu-btn {
@@ -262,9 +291,12 @@
             border-radius: 10px;
             color: var(--lighter-accent) !important;
             gap: 0.65rem;
-            margin: 0.75rem 1rem 0.5rem;
-            padding: 0.8rem 1rem;
-            width: calc(100% - 2rem);
+            margin: 0.6rem 0.45rem 0.5rem;
+            padding: 0.7rem 0.9rem;
+            width: auto;
+            min-width: 10.5rem;
+            justify-content: flex-start;
+            text-align: left;
             font-weight: 600;
             box-shadow: 0 5px 18px rgba(0, 0, 0, 0.22);
         }
@@ -330,38 +362,34 @@
         }
 
         main {
-            padding-top: 7vh;
+            padding-top: 3.75rem;
+            min-height: calc(100vh - 12rem);
+        }
+
+        .nav-links-menu:not(.nav-active) {
+            visibility: hidden;
+            pointer-events: none;
         }
 
         @media (max-width: 900px) {
             header {
-                padding: 0.5vh 0.07rem;
-                position: fixed;
-                width: 100%;
+                padding: 0.5rem 0;
+                height: 3.5rem;
             }
 
             main {
-                padding-top: 7vh;
+                padding-top: 3.5rem;
             }
 
             nav {
                 position: relative;
                 justify-content: space-between;
-                padding: 0 1rem;
-                min-height: 7vh;
+                width: 100%;
+                padding: 0;
             }
 
             .nav-left {
-                position: static;
-            }
-
-            .nav-title {
-                position: static;
-            }
-
-            .nav-title .logo {
-                width: 6vh;
-                height: 6vh;
+                gap: 0.2rem;
             }
 
             .nav-links-visible {
@@ -370,11 +398,6 @@
 
             .hamburger {
                 display: flex;
-                position: static;
-            }
-
-            .hamburger i {
-                font-size: 5vh;
             }
 
             .footer-container {
@@ -391,44 +414,33 @@
                 display: block;
                 align-self: center;
                 text-align: justify;
-                width: 75%;
-                margin-left: auto;
-                margin-right: auto;
+                width: 90%;
+                margin: 1.5rem auto 0;
             }
         }
 
         @media (max-width: 550px) {
             .nav-title .title a {
-                font-size: 6vw;
-            }
-
-            .hamburger i {
-                font-size: 8vw;
+                font-size: 1.25rem;
             }
 
             .hamburger {
-                width: 9vw;
-                height: 9vw;
+                width: 2.1rem;
+                height: 2.1rem;
             }
 
-            nav {
-                justify-content: space-between;
-                align-items: center;
+            .hamburger i {
+                font-size: 1.15rem;
             }
 
-            .nav-left {
-                display: flex;
-                align-items: center;
-            }
-
-            .logo {
-                width: 12vw;
-                height: 12vw;
+            .nav-title .logo {
+                width: 1.85rem;
+                height: 1.85rem;
             }
         }
     </style>
     <link rel="icon" href="./media/logo.webp">
-    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/style.css?v=responsive-4">
     <link rel="stylesheet" href="./css/icons.css">
     <link rel="stylesheet" href="./css/details.css">
     <link rel="preload" href="./webfonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin="anonymous">
@@ -548,45 +560,48 @@
         const hamburger = document.querySelector(".hamburger");
         const navLinksMenu = document.querySelector(".nav-links-menu");
 
-        const navhome = document.getElementById('navhome');
-        const navsearch = document.getElementById('navsearch');
-        const navsayhi = document.getElementById('navsayhi');
-        const navsignin = document.getElementById('navsignin');
-        const navhomeMenu = document.getElementById('navhome-menu');
-        const navsearchMenu = document.getElementById('navsearch-menu');
-        const navsayhiMenu = document.getElementById('navsayhi-menu');
-        const navmovies = document.getElementById('navmovies');
-        const navbooks = document.getElementById('navbooks');
-        const navmanga = document.getElementById('navmanga');
-        const navgames = document.getElementById('navgames');
-        const navanime = document.getElementById('navanime');
-        const navsigninMenu = document.getElementById('navsignin-menu');
-        const navregisterMenu = document.getElementById('navregister-menu');
-
-        hamburger.addEventListener("click", () => {
-            navLinksMenu.classList.toggle("nav-active");
-        });
-
         const closeMenu = () => {
-            if (navLinksMenu.classList.contains('nav-active')) {
+            if (navLinksMenu && navLinksMenu.classList.contains('nav-active')) {
                 navLinksMenu.classList.remove('nav-active');
             }
         };
 
-        if (navhome) navhome.addEventListener('click', closeMenu);
-        if (navsearch) navsearch.addEventListener('click', closeMenu);
-        if (navsayhi) navsayhi.addEventListener('click', closeMenu);
-        if (navsignin) navsignin.addEventListener('click', closeMenu);
-        if (navhomeMenu) navhomeMenu.addEventListener('click', closeMenu);
-        if (navsearchMenu) navsearchMenu.addEventListener('click', closeMenu);
-        if (navsayhiMenu) navsayhiMenu.addEventListener('click', closeMenu);
-        if (navmovies) navmovies.addEventListener('click', closeMenu);
-        if (navbooks) navbooks.addEventListener('click', closeMenu);
-        if (navmanga) navmanga.addEventListener('click', closeMenu);
-        if (navgames) navgames.addEventListener('click', closeMenu);
-        if (navanime) navanime.addEventListener('click', closeMenu);
-        if (navsigninMenu) navsigninMenu.addEventListener('click', closeMenu);
-        if (navregisterMenu) navregisterMenu.addEventListener('click', closeMenu);
+        window.closeNavMenu = closeMenu;
+
+        if (hamburger) {
+            hamburger.addEventListener("click", (e) => {
+                e.stopPropagation();
+                if (navLinksMenu) {
+                    navLinksMenu.classList.toggle("nav-active");
+                }
+            });
+        }
+
+        if (navLinksMenu) {
+            navLinksMenu.addEventListener('click', (e) => {
+                if (e.target.closest('a')) {
+                    closeMenu();
+                }
+            });
+        }
+
+        window.addEventListener('hashchange', closeMenu);
+
+        document.addEventListener('click', (e) => {
+            if (navLinksMenu && navLinksMenu.classList.contains('nav-active')) {
+                if (!navLinksMenu.contains(e.target) && !hamburger.contains(e.target)) {
+                    closeMenu();
+                }
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeMenu();
+            }
+        });
+
+        window.addEventListener('hashchange', closeMenu);
     </script>
     <script type="module" src="./js/supabase.js"></script>
     <script type="module" src="./js/api.js"></script>

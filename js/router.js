@@ -15,6 +15,9 @@ const routes = {
 };
 
 export const handleRoute = async () => {
+  if (typeof window.closeNavMenu === 'function') {
+    window.closeNavMenu();
+  }
   setTimeout(() => {
     window.scrollTo(0, 0);
   }, 10);

@@ -19,7 +19,7 @@ console.log(`Serving static files from: ${staticDir}`);
 app.use(express.static(staticDir));
 
 // Fallback to index.html for SPA routing
-app.get('*', (req, res) => {
+app.get('/{*splat}', (req, res) => {
   const indexPath = path.join(staticDir, 'index.html');
   if (fs.existsSync(indexPath)) {
     res.sendFile(indexPath);

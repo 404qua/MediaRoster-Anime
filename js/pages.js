@@ -15,6 +15,17 @@ export function loadPageContent(pageName, authData = null) {
   if (navsearch) navsearch.style.color = '#ddd';
   if (navsignin && !navsignin.classList.contains('nav-user-btn')) navsignin.style.color = '#ddd';
 
+  const randomDiv = document.getElementById('randomDiv');
+  const isAuthPage = pageName === 'signin' || pageName === 'register' || pageName === 'profile-setup' || pageName === 'profile';
+  if (randomDiv) {
+    if (isAuthPage) {
+      randomDiv.style.display = 'none';
+    } else {
+      randomDiv.style.display = 'block';
+      randomAnime();
+    }
+  }
+
   if (pageName === 'home') loadHomePage();
   else if (pageName === 'search') loadSearchPage();
   else if (pageName === 'signin') {
@@ -108,13 +119,15 @@ export async function loadHomePage() {
             <span data-type="members"><i class="fas fa-users"></i> ${anime.members.toLocaleString()}</span>
             <span data-type="rank"><i class="fas fa-trophy"></i> Rank: #${anime.rank}</span>
           </div>
-          <a href="./#/details-${anime.mal_id}" class="slide-button">View Details</a>
-          <a href="${anime.images.source}" style="width: 100px;" target="_blank" class="slide-source">Original image</a>
+          <div class="slide-actions">
+            <a href="./#/details-${anime.mal_id}" class="slide-button"><i class="fas fa-info-circle"></i> View Details</a>
+            <a href="${anime.images.source}" target="_blank" rel="noopener noreferrer" class="slide-source"><i class="fas fa-external-link-alt"></i> Original Image</a>
+          </div>
         </div>
       </div>
     `).join('')}
-    <a class="prev"><</a>
-    <a class="next">></a>
+    <button type="button" class="prev" aria-label="Previous Slide"><i class="fas fa-chevron-left"></i></button>
+    <button type="button" class="next" aria-label="Next Slide"><i class="fas fa-chevron-right"></i></button>
   </div>
 `;
   if (currentHash !== '' && currentHash !== '#/') return;

@@ -11,7 +11,9 @@ export function initSlideshow() {
     slides.forEach(slide => slide.classList.remove('active'));
     if (slideIndex >= slides.length) slideIndex = 0;
     if (slideIndex < 0) slideIndex = slides.length - 1;
-    slides[slideIndex].classList.add('active');
+    if (slides[slideIndex]) {
+      slides[slideIndex].classList.add('active');
+    }
   }
 
   function resetInterval() {
@@ -19,56 +21,82 @@ export function initSlideshow() {
     interval = setInterval(() => {
       slideIndex++;
       showSlides();
-    }, 5000);
+    }, 7000);
   }
 
   if (prev && next) {
-    prev.addEventListener('click', () => {
+    prev.addEventListener('click', (e) => {
+      e.preventDefault();
       slideIndex--;
       showSlides();
       resetInterval();
     });
 
-    next.addEventListener('click', () => {
+    next.addEventListener('click', (e) => {
+      e.preventDefault();
       slideIndex++;
       showSlides();
       resetInterval();
     });
   }
 
-  // Swipe functionality
+  // Swipe functionality with threshold check to avoid interfering with vertical scroll
   const slideshowContainer = document.querySelector('.slideshow-container');
-  let touchstartX = 0;
-  let touchendX = 0;
+  if (slideshowContainer) {
+    let touchstartX = 0;
+    let touchstartY = 0;
+    let touchendX = 0;
+    let touchendY = 0;
+    let lastSwipeAt = 0;
 
-  function handleGesture() {
-    if (touchendX < touchstartX) {
-      slideIndex++;
-      showSlides();
-      resetInterval();
+    function handleGesture() {
+      const deltaX = touchendX - touchstartX;
+      const deltaY = touchendY - touchstartY;
+
+      // Ensure it's a deliberate horizontal swipe (at least 45px, and more horizontal than vertical)
+      if (Date.now() - lastSwipeAt < 1200) return;
+      if (Math.abs(deltaX) > 45 && Math.abs(deltaX) > Math.abs(deltaY) * 1.3) {
+        lastSwipeAt = Date.now();
+        if (deltaX < 0) {
+          slideIndex++;
+          showSlides();
+          resetInterval();
+        } else {
+          slideIndex--;
+          showSlides();
+          resetInterval();
+        }
+      }
     }
-    if (touchendX > touchstartX) {
-      slideIndex--;
-      showSlides();
-      resetInterval();
-    }
+
+    slideshowContainer.addEventListener('touchstart', e => {
+      touchstartX = e.changedTouches[0].clientX;
+      touchstartY = e.changedTouches[0].clientY;
+    }, { passive: true });
+
+    slideshowContainer.addEventListener('touchend', e => {
+      touchendX = e.changedTouches[0].clientX;
+      touchendY = e.changedTouches[0].clientY;
+      handleGesture();
+    }, { passive: true });
   }
 
-  slideshowContainer.addEventListener('touchstart', e => {
-    touchstartX = e.changedTouches[0].screenX;
-  });
-
-  slideshowContainer.addEventListener('touchend', e => {
-    touchendX = e.changedTouches[0].screenX;
-    handleGesture();
-  });
   showSlides();
   resetInterval();
 }
 
-export function initFlashcardHover() { // following is a functinal chaos. If you wish to work on it, please take responsibility yourself
+export function initFlashcardHover() {
+    const isMobile = window.innerWidth <= 768 || (window.matchMedia && !window.matchMedia('(hover: hover) and (pointer: fine)').matches);
+    if (isMobile) {
+      const popup = document.getElementById('flash-popup');
+      if (popup) popup.hidden = true;
+      return;
+    }
+
     const flashcards = document.querySelectorAll('.flashcard-link:not([data-popup-init])');
     const popup = document.getElementById('flash-popup');
+    if (!popup) return;
+
     let onCard = false;
     let onPopup = false;
     let activeCard = null;
@@ -91,9 +119,7 @@ export function initFlashcardHover() { // following is a functinal chaos. If you
           scrollRaf = null;
           if (!popup.hidden && activeCard) positionPopup(activeCard);
         });
-      }, true);
-  
-      popup.addEventListener('touchstart', e => e.stopPropagation());
+      }, { passive: true });
       
       popup.addEventListener('mouseenter', () => {
         onPopup = true;
@@ -102,98 +128,75 @@ export function initFlashcardHover() { // following is a functinal chaos. If you
   
       popup.addEventListener('mouseleave', (e) => {
         onPopup = false;
-        // prevent flickering and wrong hides
         if (e.relatedTarget && e.relatedTarget.closest('.flashcard-link')) return;
         if (activeCard && activeCard.contains(e.relatedTarget)) return;
-        popupHide = setTimeout(tryHide, 50);
+        popupHide = setTimeout(tryHide, 80);
       });
   
-      document.addEventListener('touchstart', hidePopup);
       document.addEventListener('click', (e) => {
         if (activeCard && !activeCard.contains(e.target) && !popup.contains(e.target)) {
           hidePopup();
         }
       });
+
       window.addEventListener('hashchange', () => {
         onCard = false;
         onPopup = false;
-        resizeRaf = null;
-        scrollRaf = null;
-        popupHide = null;
         activeCard = null;
         hidePopup();
       });
       status.popupInit = true;
     }
   
-    function getPopupWidth() {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      const res = [];
-  
-      if (w < 300) res.push(w * 0.9);
-      else if (w < 600) res.push(w * 0.7);
-      else if (w < 800) res.push(w * 0.5);
-      else res.push(w * 0.3);
-  
-      if (h < 300) res.push(h * 0.7);
-      else if (h < 500) res.push(h * 0.55);
-      else if (h < 700) res.push(h * 0.4);
-      else res.push(h * 0.25);
-  
-      return res;
-    }
-  
     function positionPopup(card) {
         const pos = card.getBoundingClientRect();
-        const [popupWidth, popupHeight] = getPopupWidth();
-        const overlap = pos.width * 0.2;
-        const extraHeight = pos.height * 0.1;
+        const popupWidth = Math.min(320, window.innerWidth - 30);
+        const margin = 12;
 
-        if (window.innerWidth - pos.right > popupWidth) {
-            popup.style.left = (pos.right - overlap) + "px";
-        } else if (pos.left > popupWidth) {
-            popup.style.left = (pos.left - popupWidth + overlap * 2) + "px";
-        } else {
-            popup.style.left = (window.innerWidth - popupWidth) + "px";
-        };
+        let left = pos.right + margin;
+        if (left + popupWidth > window.innerWidth - margin) {
+            left = pos.left - popupWidth - margin;
+            if (left < margin) {
+                left = Math.max(margin, (window.innerWidth - popupWidth) / 2);
+            }
+        }
 
-        if (pos.top > extraHeight) {
-            popup.style.top = (pos.top - extraHeight) + "px";
-        } else if (window.innerHeight - pos.bottom > extraHeight) {
-            popup.style.top = (pos.bottom - extraHeight) + "px";
-        } else {
-            popup.style.top = (pos.top + window.innerHeight * 0.7)
-        };
+        let top = pos.top;
+        if (top + 280 > window.innerHeight) {
+            top = Math.max(margin + 60, window.innerHeight - 300);
+        }
 
+        popup.style.left = `${Math.round(left)}px`;
+        popup.style.top = `${Math.round(top)}px`;
+        popup.style.width = `${popupWidth}px`;
         popup.hidden = false;
-        popup.style.zIndex = '10';
+        popup.style.zIndex = '1000';
     }
   
     function addPopup(card) {
       const d = card.dataset;
-      const shortTitle = (d.title || '').length > 20 ? d.title.slice(0, 20) + '...' : (d.title || '');
-  
+      const title = d.title || 'Anime';
+      const synopsis = d.synopsis || 'No synopsis available.';
+      const genres = d.genres || 'Unknown';
+      const studios = d.studios || 'Unknown';
+      const statusText = d.status ? ` • ${d.status}` : '';
+
       popup.innerHTML = `
-        <span id="flash-popup-rank">#${d.rank || 'N/A'}</span>
-        <span id="flash-popup-title">${shortTitle}</span>
-        <span class="flash-popup-status">- ${d.status || 'Unknown'}</span>
-        <div id="flash-popup-meta">
-          <div><i class="fas fa-star"></i> ${d.score || 'N/A'}</div>
-          <div><i class="fas fa-video"></i> ${d.type || 'N/A'}</div>
-          <div><i class="fa-solid fa-user-group"></i> ${d.popularity || 'N/A'}</div>
+        <div class="flash-popup-header">
+          <div id="flash-popup-title">${title}</div>
+          <div id="flash-popup-status">${statusText}</div>
         </div>
-        <p id="flash-popup-synopsis">${d.synopsis || ''}</p>
-        <p id="flash-popup-genres"><span>Genres: </span>${d.genres || 'N/A'}</p>
-        <p id="flash-popup-episodes">${d.episodes ? "<span>Episodes: </span>" + d.episodes : ""}</p>
-        <p id="flash-popup-studios"><span>Studios: </span>${d.studios || 'Unknown'}</p>
-        <p id="flash-popup-rating"><span>Rating: </span>${d.rating || "N/A"}</p>
+        <p id="flash-popup-synopsis">${synopsis}</p>
+        <div class="flash-popup-meta-footer">
+          <p id="flash-popup-genres"><span>Genres: </span>${genres}</p>
+          <p id="flash-popup-studios"><span>Studios: </span>${studios}</p>
+        </div>
       `;
       positionPopup(card);
     }
   
     flashcards.forEach(card => {
-      if (card.dataset.popupInit == 'true') return;
+      if (card.dataset.popupInit === 'true') return;
       card.dataset.popupInit = 'true';
   
       card.addEventListener('mouseenter', () => {
@@ -205,14 +208,8 @@ export function initFlashcardHover() { // following is a functinal chaos. If you
   
       card.addEventListener('mouseleave', (e) => {
         onCard = false;
-        // prevent flickering
         if (popup.contains(e.relatedTarget)) return; 
-        popupHide = setTimeout(tryHide, 50);
-      });2
-  
-      card.addEventListener('touchstart', (e) => {
-        e.stopPropagation();
-        addPopup(card);
+        popupHide = setTimeout(tryHide, 80);
       });
     });
   
@@ -236,7 +233,7 @@ export function initGalleryControls() {
 
   prevButtons.forEach(btn => {
     btn.addEventListener('click', () => {
-      const gallery = btn.parentElement.querySelector('.horizontal-gallery');
+      const gallery = btn.closest('.reviews-container, .top-rated-container, .airing-container, .seasonal-container')?.querySelector('.horizontal-gallery');
       if (gallery) {
         gallery.scrollBy({
           left: -400,
@@ -248,7 +245,7 @@ export function initGalleryControls() {
 
   nextButtons.forEach(btn => {
     btn.addEventListener('click', () => {
-      const gallery = btn.parentElement.querySelector('.horizontal-gallery');
+      const gallery = btn.closest('.reviews-container, .top-rated-container, .airing-container, .seasonal-container')?.querySelector('.horizontal-gallery');
       if (gallery) {
         gallery.scrollBy({
           left: 400,
@@ -262,6 +259,8 @@ export function initGalleryControls() {
 // random
 export function randomAnime() {
   const randomButton = document.getElementById('random-anime-button');
+  if (!randomButton || randomButton.dataset.randomInit === 'true') return;
+  randomButton.dataset.randomInit = 'true';
   randomButton.addEventListener('click', () => {
     const chance = Math.floor(Math.random() * 100);
     if (chance < 1) {

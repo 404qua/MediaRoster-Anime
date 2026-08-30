@@ -1,5 +1,5 @@
 import { getAnimeDetails, getAnimeCharacters, getAnimeStaff, getAnimeInfo, getRandomAnime, getAnimeReviews } from '../api.js';
-import { initFlashcardHover, initGalleryControls } from './initializer.js';
+import { initFlashcardHover, initGalleryControls, randomAnime } from './initializer.js';
 import { showLoader, hideLoader, loadCSS, load404, updateMetaTags } from '../pages.js';
 import { createFlashcard, escapeHTML } from './UIs.js';
 import { supabase } from '../supabase.js';
@@ -11,7 +11,9 @@ export async function loadDetailsPage(animeId = null) {
   document.getElementById('navsearch').style.color = '#ddd';
   const content = document.getElementById('content');
   content.innerHTML = '';
-  document.getElementById('randomDiv').style.display = 'none';
+  const randomDiv = document.getElementById('randomDiv');
+  if (randomDiv) randomDiv.style.display = 'block';
+  randomAnime();
   const link = document.createElement('link');
   link.rel = 'preload';
   link.href = './media/details-bg.webp';
@@ -188,9 +190,11 @@ export async function loadDetailsPage(animeId = null) {
     const staffHTML = charactersHTML;
     const reviewsHTML = `
       <div class="reviews-container">
-        <div class="gallery-prev">&lt</div>
-        <div class="gallery-next">&gt</div>
         <h2 class="floating-header">What People Have to Say</h2>
+        <div class="reviews-controls">
+          <button type="button" class="gallery-prev" aria-label="Previous review">&lt;</button>
+          <button type="button" class="gallery-next" aria-label="Next review">&gt;</button>
+        </div>
         <div class="loader" id="reviews-loader">
           <div class="dot"></div>
           <div class="dot"></div>
@@ -218,8 +222,11 @@ export async function loadDetailsPage(animeId = null) {
           </div>
           <div class="details-info">
             ${heroStatsHTML}
+          </div>
+          <div class="details-synopsis-wrapper">
             <h2 class="synopsis-header">Synopsis</h2>
-            <p class="details-synopsis">${escapeHTML(anime.synopsis || 'No synopsis available.')}</p>
+            <p class="details-synopsis is-clamped" id="details-synopsis-text">${escapeHTML(anime.synopsis || 'No synopsis available.')}</p>
+            <button type="button" class="synopsis-show-more" id="synopsis-show-more" hidden>Show more</button>
           </div>
         </div>
       </div>
@@ -283,6 +290,7 @@ export async function loadDetailsPage(animeId = null) {
       content.innerHTML = detailsHTML;
       initDetailsNav();
       initWatchlistButton(animeId);
+      initSynopsisToggle();
       loadReviews(animeId);
       loadCharecters(animeId);
       loadStaff(animeId);
@@ -294,7 +302,6 @@ export async function loadDetailsPage(animeId = null) {
   } finally {
     if (window.location.hash === `#/details-${animeId}`) {
       hideLoader();
-      document.getElementById('randomDiv').style.display = 'none';
     }
   }
 }
@@ -456,6 +463,7 @@ async function loadReviews(animeId) {
   const galleryContainer = document.createElement('div');
   const loader = document.getElementById('reviews-loader');
   galleryContainer.className = 'horizontal-gallery';
+  galleryContainer.setAttribute('aria-label', 'Anime reviews');
 
   try {
     const reviewsData = await getAnimeReviews(animeId);
@@ -548,6 +556,8 @@ function initReviewsStuff() {
     const name = card.dataset.username;
     const score = card.dataset.score;
 
+    container.hidden = false;
+    container.style.display = 'flex';
     container.style.zIndex = '9999';
     container.innerHTML = '';
 
@@ -573,6 +583,8 @@ function initReviewsStuff() {
     container.appendChild(contentDiv);
 
     const closePopup = () => {
+      container.hidden = true;
+      container.style.display = 'none';
       container.style.zIndex = '-10';
       container.innerHTML = '';
     };
@@ -597,6 +609,25 @@ function initReviewsStuff() {
     card.addEventListener('click', () => { showReview(card) })
   });
 };
+
+function initSynopsisToggle() {
+  const text = document.getElementById('details-synopsis-text');
+  const btn = document.getElementById('synopsis-show-more');
+  if (!text || !btn) return;
+
+  requestAnimationFrame(() => {
+    const isOverflowing = text.scrollHeight > text.clientHeight + 1;
+    if (!isOverflowing) {
+      btn.hidden = true;
+      return;
+    }
+    btn.hidden = false;
+    btn.addEventListener('click', () => {
+      const expanded = text.classList.toggle('is-clamped') === false;
+      btn.textContent = expanded ? 'Show less' : 'Show more';
+    });
+  });
+}
 
 async function initWatchlistButton(animeId) {
   const btn = document.getElementById('details-watchlist-btn');
