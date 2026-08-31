@@ -9,7 +9,6 @@
   justify-content: start;
 }
 
-/* Hero Section - Full Width */
 .details-hero-wrapper {
   width: 100%;
   max-width: var(--content-max-width);
@@ -111,7 +110,6 @@
   margin: 0 auto;
 }
 
-/* Background image with low opacity - stretched to fit */
 .details-hero-wrapper::before {
   content: '';
   position: absolute;
@@ -134,7 +132,6 @@
   z-index: 0;
 }
 
-/* Transparent overlay for better readability */
 .details-hero-wrapper::after {
   content: '';
   position: absolute;
@@ -1285,6 +1282,10 @@
   left: auto;
   right: auto;
   transform: none;
+  background: var(--bg-color-secondary);
+  color: var(--primary-accent);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
 }
 
 .egg-msg p:first-child {

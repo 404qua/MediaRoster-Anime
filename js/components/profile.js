@@ -76,7 +76,6 @@ export async function loadProfilePage(cachedAuth = null, targetUsername = null) 
         profile = currentProfile;
         isOwnProfile = true;
     } else {
-        // Target profile route: e.g. #/profile-username or #/user-username
         if (currentProfile && currentProfile.username.toLowerCase() === targetUsername.toLowerCase()) {
             profile = currentProfile;
             isOwnProfile = true;
@@ -237,10 +236,8 @@ export async function loadProfilePage(cachedAuth = null, targetUsername = null) 
         </div>
     `;
 
-    // Initialize watchlist data & interactions
     initWatchlist(profile, isOwnProfile, currentUser);
 
-    // Share button listener (for all profiles)
     const shareBtn = document.getElementById('share-profile-btn');
     if (shareBtn) {
         shareBtn.addEventListener('click', async () => {
@@ -290,7 +287,6 @@ export async function loadProfilePage(cachedAuth = null, targetUsername = null) 
 
     if (!isOwnProfile) return;
 
-    // Attach listeners for own profile
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', async () => {
@@ -444,7 +440,6 @@ export async function loadProfilePage(cachedAuth = null, targetUsername = null) 
 }
 
 async function initWatchlist(profile, isOwnProfile, currentUser) {
-    // Visibility toggle listener for owner
     if (isOwnProfile) {
         const toggleCheckbox = document.getElementById('watchlist-visibility-checkbox');
         const toggleLabel = document.getElementById('watchlist-visibility-label');
@@ -473,7 +468,6 @@ async function initWatchlist(profile, isOwnProfile, currentUser) {
         }
     }
 
-    // If viewing someone else's profile and it's private, no need to fetch items
     if (!isOwnProfile && !profile.watchlist_public) {
         return;
     }
@@ -505,7 +499,6 @@ async function initWatchlist(profile, isOwnProfile, currentUser) {
             return;
         }
 
-        // Fetch anime details for each entry in parallel
         const enrichedPromises = entries.map(async (entry) => {
             if (entry.type === 'anime') {
                 try {
@@ -521,7 +514,6 @@ async function initWatchlist(profile, isOwnProfile, currentUser) {
 
         const enrichedItems = await Promise.all(enrichedPromises);
 
-        // Group by media type
         const groups = {};
         enrichedItems.forEach(item => {
             const type = item.type || 'anime';
@@ -560,19 +552,13 @@ async function initWatchlist(profile, isOwnProfile, currentUser) {
                     </div>
                 </div>
             `;
-        }
-
+        };
         container.innerHTML = groupsHTML;
 
-        // Setup whole card click navigation to details (excluding status container)
         setupWatchlistCardClicks();
-
-        // Setup status dropdown changes for owner
         if (isOwnProfile) {
             setupStatusChangeListeners(currentUser);
         }
-
-        // Setup searchbar filtering & suggestions
         setupWatchlistSearch(enrichedItems);
 
     } catch (err) {
@@ -802,8 +788,7 @@ function setupWatchlistSearch(enrichedItems) {
         } else {
             if (noResMsg) noResMsg.remove();
         }
-
-        // Generate suggestions dropdown from watchlist items
+        
         const matchingItems = enrichedItems.filter(item => {
             const anime = item.anime;
             const title = (anime?.title_english || anime?.title || '').toLowerCase();

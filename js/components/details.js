@@ -207,7 +207,7 @@ export async function loadDetailsPage(animeId = null) {
         <div class="details-hero-top-bar">
           <div class="details-watchlist-wrapper">
             <button id="details-watchlist-btn" class="details-watchlist-btn" data-id="${anime.mal_id}" aria-label="Add to Watchlist">
-              <i class="fa-regular fa-plus"></i>
+              <i class="fa-solid fa-bookmark"></i>
               <span>Add to Watchlist</span>
             </button>
           </div>
@@ -580,6 +580,10 @@ function initReviewsStuff() {
       </div>
     `;
 
+    container.addEventListener('scroll', (e) => {
+      e.stopPropagation();
+    });
+
     container.appendChild(contentDiv);
 
     const closePopup = () => {
@@ -674,7 +678,6 @@ async function initWatchlistButton(animeId) {
         if (error) throw error;
         currentEntry = null;
       } else {
-        // Add to watchlist
         const { error } = await supabase
           .from('watchlist')
           .insert({
@@ -708,7 +711,7 @@ function updateWatchlistButtonUI(btn, entry) {
   } else {
     btn.className = 'details-watchlist-btn';
     btn.innerHTML = `
-      <i class="fa-regular fa-bookmark"></i>
+      <i class="fa-solid fa-bookmark"></i>
       <span>Add to Watchlist</span>
     `;
   }

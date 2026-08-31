@@ -40,7 +40,6 @@ export function initSlideshow() {
     });
   }
 
-  // Swipe functionality with threshold check to avoid interfering with vertical scroll
   const slideshowContainer = document.querySelector('.slideshow-container');
   if (slideshowContainer) {
     let touchstartX = 0;
@@ -52,10 +51,9 @@ export function initSlideshow() {
     function handleGesture() {
       const deltaX = touchendX - touchstartX;
       const deltaY = touchendY - touchstartY;
-
-      // Ensure it's a deliberate horizontal swipe (at least 45px, and more horizontal than vertical)
-      if (Date.now() - lastSwipeAt < 1200) return;
-      if (Math.abs(deltaX) > 45 && Math.abs(deltaX) > Math.abs(deltaY) * 1.3) {
+      
+      if (Date.now() - lastSwipeAt < 500) return;
+      if (Math.abs(deltaX) > 45) {
         lastSwipeAt = Date.now();
         if (deltaX < 0) {
           slideIndex++;
@@ -256,7 +254,6 @@ export function initGalleryControls() {
   });
 }
 
-// random
 export function randomAnime() {
   const randomButton = document.getElementById('random-anime-button');
   if (!randomButton || randomButton.dataset.randomInit === 'true') return;

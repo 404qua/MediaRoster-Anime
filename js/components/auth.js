@@ -93,18 +93,17 @@ function renderNavUI(user, profile) {
 }
 
 export async function initAuthUI() {
+    // initialize existing session and cleanup any invalid sessions
     if (authPromise) return authPromise;
 
     authPromise = (async () => {
         try {
-            // First check if a session exists locally
             const { data: { session } } = await supabase.auth.getSession();
             if (!session?.user) {
                 renderNavUI(null, null);
                 return { user: null, profile: null };
             }
 
-            // Verify with the auth server to ensure the session is valid
             const { data: { user }, error: userError } = await supabase.auth.getUser();
             if (userError || !user) {
                 console.warn('Invalid/expired session detected, clearing local auth state.');
@@ -143,7 +142,6 @@ export async function initAuthUI() {
     return authPromise;
 }
 
-// Listen for auth state changes globally
 supabase.auth.onAuthStateChange(async (event) => {
     if (event === 'SIGNED_OUT') {
         renderNavUI(null, null);

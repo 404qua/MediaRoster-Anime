@@ -2,7 +2,6 @@ main {
   flex-grow: 1;
 }
 
-/* Slideshow */
 .slideshow-container {
   position: relative;
   width: min(100%, var(--content-max-width));
@@ -437,7 +436,6 @@ main {
   hyphenate-limit-chars: 4 2 2;
 }
 
-/* Loader and Error */
 #loader {
   display: none;
   justify-content: center;
@@ -496,42 +494,46 @@ main {
 }
 
 /* Review Popup */
-/* Review Popup */
 #popup {
   position: fixed;
-  inset: 0;
   z-index: -10;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 1rem;
   background: rgba(0, 0, 0, 0.78);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   box-sizing: border-box;
+  overscroll-behavior: contain;
+  height: calc(100vh - 3.5rem);
+  top: 3rem;
+  width: 100%;
+  padding-top: min(5rem, 10vh);
+  padding-bottom: min(4rem, 9vh);
 }
 
 #popup-content {
   position: relative;
   width: min(92vw, 700px);
-  max-height: 85vh;
   display: flex;
   flex-direction: column;
   padding: 0;
   border-radius: 18px;
   overflow: hidden;
   background: linear-gradient(135deg,
-      rgba(35, 35, 45, 0.98),
+      rgba(9, 9, 14, 0.98),
       rgba(25, 25, 35, 0.98));
   border: 1px solid rgba(255, 255, 255, 0.12);
+  overscroll-behavior: contain;
   box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.65),
     0 0 25px rgba(255, 255, 255, 0.05);
   color: var(--text-color);
   box-sizing: border-box;
+  height: fit-content;
+  max-height: 100%;
 }
 
-/* Sticky Top Bar within Popup */
 .popup-top-bar {
   position: sticky;
   top: 0;
@@ -661,7 +663,6 @@ main {
   }
 }
 
-/* Popup Scrollbar */
 .popup-body::-webkit-scrollbar {
   width: 8px;
 }
@@ -943,7 +944,6 @@ main {
 
   .slide-content {
     padding: 3.5rem 1.5rem 2.25rem;
-    bottom: 0.5rem;
   }
 
   .prev {
@@ -1102,7 +1102,6 @@ main {
   color: var(--secondary-accent);
 }
 
-/* Very Small Mobile (< 360px) */
 @media (max-width: 360px) {
   .flashcard {
     width: 8.25rem;
@@ -1211,9 +1210,6 @@ main {
   }
 }
 
-
-
-/* search suggestions */
 #search-suggestions {
   display: none;
   width: 100%;
@@ -1291,12 +1287,6 @@ main {
 
 .slideshow-container .slide-content {
   padding: 2.5rem clamp(1rem, 3vw, 3.5rem) 1rem;
-}
-
-@media (max-width: 600px) {
-  .slideshow-container .slide-content {
-    padding: 1.5rem 1rem 11rem;
-  }
 }
 
 .search-suggestion {
