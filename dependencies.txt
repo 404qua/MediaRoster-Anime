@@ -1,8 +1,0 @@
-python>=3.10          # required for hash.py
-jsmin>=3.0.1          # Minifies JS files
-csscompressor>=0.9.8  # Minifies CSS files
-htmlmin>=0.1.12       # Minifies HTML files
-
-# NOTE: These packages are only needed for the build process.
-#       The raw code can be run without undergoing the build process
-browser # that is all u need to run the site
